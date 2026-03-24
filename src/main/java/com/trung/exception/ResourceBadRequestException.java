@@ -2,16 +2,13 @@ package com.trung.exception;
 
 import lombok.Getter;
 
-import java.util.List;
 import java.util.Map;
 
 @Getter
-public class ResourceConflictException extends Exception{
+public class ResourceBadRequestException extends Exception{
     private final Map<String, String> errors;
-
-    public ResourceConflictException(String message, Map<String, String> errors) {
+    public ResourceBadRequestException(String message, Map<String, String> errors){
         super(message);
         this.errors = errors;
     }
-
 }

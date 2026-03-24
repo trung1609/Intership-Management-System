@@ -16,6 +16,12 @@ public interface IUserRepository extends JpaRepository<Users, Long> {
     boolean existsByUsernameAndIsDeletedFalseAndIsActiveTrue(String username);
     boolean existsByEmailAndIsDeletedFalseAndIsActiveTrue(String email);
 
-    Page<Users> findByIsDeletedFalseAndIsActiveTrue(Pageable pageable);
+    Optional<Users> findByUserIdAndIsDeletedFalseAndIsActiveTrue(Long userId);
+    Optional<Users> findByUserIdAndIsDeletedFalse(Long userId);
+
+    Page<Users> findAllByIsDeletedFalseAndIsActiveTrue(Pageable pageable);
     Page<Users> findByRoleAndIsDeletedFalseAndIsActiveTrue(Role role, Pageable pageable);
+
+    boolean existsByUsernameAndIsDeletedFalseAndIsActiveTrueAndUserIdNot(String username, Long id);
+    boolean existsByEmailAndIsDeletedFalseAndIsActiveTrueAndUserIdNot(String email, Long id);
 }

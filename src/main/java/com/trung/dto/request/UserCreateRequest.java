@@ -1,0 +1,33 @@
+package com.trung.dto.request;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import lombok.*;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class UserCreateRequest {
+
+    @NotBlank(message = "Username is required")
+    private String username;
+
+    @NotBlank(message = "Password is required")
+    private String password;
+
+    @NotBlank(message = "Full name is required")
+    private String fullName;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email is invalid")
+    private String email;
+
+    @Pattern(regexp = "^0[356789]\\d{8}$", message = "Phone number is invalid")
+    private String phoneNumber;
+
+    @NotBlank(message = "Role is required")
+    private String role;
+}

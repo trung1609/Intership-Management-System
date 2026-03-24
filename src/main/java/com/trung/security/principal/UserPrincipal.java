@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 @Builder
+@Getter
 public class UserPrincipal implements UserDetails {
     private Users users;
     private Collection<? extends GrantedAuthority> authorities;
