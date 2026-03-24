@@ -72,6 +72,18 @@ public class GlobalExceptionHandler {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(ResourceForbiddenException.class)
+    public ResponseEntity<ApiResponse<Object>> handleResourceForbiddenException(ResourceForbiddenException ex) {
+        ApiResponse<Object> response = ApiResponse.builder()
+                .success(false)
+                .message("BAD_REQUEST")
+                .data(null)
+                .error(Map.of("error", ex.getMessage()))
+                .timestamp(LocalDateTime.now())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
 
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ApiResponse<Object>> handleInvalidCredentialsException(InvalidCredentialsException ex) {

@@ -3,6 +3,7 @@ package com.trung.service.impl;
 import com.trung.domain.entity.Users;
 import com.trung.domain.enums.Role;
 import com.trung.dto.request.PageRequestDTO;
+import com.trung.dto.request.UpdateRoleRequest;
 import com.trung.dto.request.UserCreateRequest;
 import com.trung.dto.request.UserUpdateRequest;
 import com.trung.dto.response.ApiResponse;
@@ -10,6 +11,7 @@ import com.trung.dto.response.PageResponseDTO;
 import com.trung.dto.response.UserResponse;
 import com.trung.exception.ResourceBadRequestException;
 import com.trung.exception.ResourceConflictException;
+import com.trung.exception.ResourceForbiddenException;
 import com.trung.exception.ResourceNotFoundException;
 import com.trung.mapper.UserMapper;
 import com.trung.repository.IUserRepository;
@@ -137,12 +139,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApiResponse<UserResponse> updateRole(Long id, String role) throws ResourceConflictException {
-        return null;
+    public ApiResponse<UserResponse> updateRole(Long id, UpdateRoleRequest request) throws ResourceConflictException, ResourceNotFoundException, ResourceForbiddenException, ResourceBadRequestException {
+        Users users = userRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        Role roleEnum = null;
+        if (request.getRole() != null && !request.getRole().isBlank()) {
+            try {
+                roleEnum = Role.valueOf(request.getRole().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                errorList.put("role", "Invalid role value");
+            }
+        }
+        if (!errorList.isEmpty()) {
+            throw new ResourceBadRequestException("BAD_REQUEST", errorList);
+        }
+
+        if (users.getRole() == Role.ROLE_ADMIN) {
+            throw new ResourceForbiddenException("Cannot change role of an admin user");
+        }
+
+        users.setRole(Role.valueOf(request.getRole().toUpperCase()));
+        userRepository.save(users);
+        return new ApiResponse<>(UserMapper.toDto(users), true, "SUCCESS", null, LocalDateTime.now());
     }
 
     @Override
-    public ApiResponse<String> deleteProfile(Long id) throws ResourceConflictException {
-        return null;
+    public ApiResponse<String> deleteProfile(Long id) throws ResourceConflictException, ResourceNotFoundException {
+        Users users = userRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        users.setDeleted(true);
+        users.setActive(false);
+        userRepository.save(users);
+        return new ApiResponse<>("User deleted successfully", true, "SUCCESS", null, LocalDateTime.now());
     }
 }

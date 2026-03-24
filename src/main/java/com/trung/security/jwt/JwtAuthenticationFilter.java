@@ -32,29 +32,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
-            String token = getTokenFromRequest(request);
+            String token = getTokenFromRequest(request); // lay token tu header
             if (token != null && jwtProvider.validateToken(token, request)){
                 String username = jwtProvider.getUsernameFromToken(token);
 
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if (userDetails != null){
-                    Users users = userRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
-                            .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
-                    if (users != null && users.isActive() && !users.isDeleted()){
-                        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities()
-                        ));
-                    }else {
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User is not active or deleted");
-                        return;
-                    }
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                Users users = userRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+
+                if (users.isActive() && !users.isDeleted()){
+                    // set vào security context để spring có thể sử dụng thông tin này cho các bước tiếp theo
+                    SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                    ));
+                }else {
+                    log.error("User {} is not active or has been deleted", username);
+                    return;
                 }
             }
         }catch (Exception e) {
             log.error(e.getMessage());
         }
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(request, response); // cho phep request tiếp tục đi tiep
     }
 
     // get token from request
