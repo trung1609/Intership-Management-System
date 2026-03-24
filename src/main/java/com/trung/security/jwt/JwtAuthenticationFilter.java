@@ -1,8 +1,7 @@
 package com.trung.security.jwt;
 
-import com.trung.domain.entity.Users;
+import com.trung.domain.entity.User;
 import com.trung.repository.IUserRepository;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                Users users = userRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
+                User users = userRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
                         .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
                 if (users.isActive() && !users.isDeleted()){

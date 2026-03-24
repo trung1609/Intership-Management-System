@@ -1,6 +1,6 @@
 package com.trung.security.principal;
 
-import com.trung.domain.entity.Users;
+import com.trung.domain.entity.User;
 import com.trung.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,7 +18,7 @@ public class UserDetailServiceCustom implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Users users = userRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
+        User users = userRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
         return UserPrincipal.builder()

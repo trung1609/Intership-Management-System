@@ -2,7 +2,6 @@ package com.trung.controller;
 
 import com.trung.dto.request.FormLoginRequest;
 import com.trung.dto.request.FormRegisterRequest;
-import com.trung.dto.request.PageRequestDTO;
 import com.trung.dto.response.ApiResponse;
 import com.trung.dto.response.JwtResponse;
 import com.trung.dto.response.RegisterResponse;
@@ -10,7 +9,7 @@ import com.trung.dto.response.UserResponse;
 import com.trung.exception.InvalidCredentialsException;
 import com.trung.exception.ResourceConflictException;
 import com.trung.exception.ResourceNotFoundException;
-import com.trung.service.AuthService;
+import com.trung.service.IAuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,7 +24,7 @@ import javax.naming.AuthenticationException;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthService authService;
+    private final IAuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegisterResponse>> register(@Valid @RequestBody FormRegisterRequest request) throws ResourceConflictException {

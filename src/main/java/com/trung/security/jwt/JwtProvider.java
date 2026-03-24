@@ -1,6 +1,6 @@
 package com.trung.security.jwt;
 
-import com.trung.domain.entity.Users;
+import com.trung.domain.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +28,7 @@ public class JwtProvider {
     }
 
     // generate token
-    public String generateToken(Users users){
+    public String generateToken(User users){
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + expire);
         Map<String, Object> claims = new HashMap<>();

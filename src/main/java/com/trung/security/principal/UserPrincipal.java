@@ -1,10 +1,8 @@
 package com.trung.security.principal;
 
-import com.trung.domain.entity.Users;
+import com.trung.domain.entity.User;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +11,7 @@ import java.util.Collection;
 @Builder
 @Getter
 public class UserPrincipal implements UserDetails {
-    private Users users;
+    private User users;
     private Collection<? extends GrantedAuthority> authorities;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

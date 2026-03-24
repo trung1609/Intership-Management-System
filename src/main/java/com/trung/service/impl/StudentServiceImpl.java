@@ -1,0 +1,187 @@
+package com.trung.service.impl;
+
+import com.trung.domain.entity.Student;
+import com.trung.domain.entity.User;
+import com.trung.domain.enums.Role;
+import com.trung.dto.request.PageRequestDTO;
+import com.trung.dto.request.StudentCreateRequest;
+import com.trung.dto.request.StudentUpdateRequest;
+import com.trung.dto.response.ApiResponse;
+import com.trung.dto.response.PageResponseDTO;
+import com.trung.dto.response.StudentResponse;
+import com.trung.exception.ResourceBadRequestException;
+import com.trung.exception.ResourceConflictException;
+import com.trung.exception.ResourceForbiddenException;
+import com.trung.exception.ResourceNotFoundException;
+import com.trung.mapper.StudentMapper;
+import com.trung.repository.IStudentRepository;
+import com.trung.repository.IUserRepository;
+import com.trung.repository.InternshipAssignmentRepository;
+import com.trung.service.IStudentService;
+import com.trung.util.PaginationUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+@Service
+@RequiredArgsConstructor
+public class StudentServiceImpl implements IStudentService {
+    private final IStudentRepository studentRepository;
+    private final IUserRepository iUserRepository;
+    private final InternshipAssignmentRepository internshipAssignmentRepository;
+
+    @Override
+    public ApiResponse<StudentResponse> createStudent(StudentCreateRequest request) throws ResourceConflictException, ResourceNotFoundException, ResourceBadRequestException {
+        Map<String, String> errorList = new HashMap<>();
+        if (studentRepository.existsByStudentCode(request.getStudentCode())) {
+            errorList.put("studentCode", "Student code already exists");
+        }
+        User user = iUserRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(request.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + request.getUserId()));
+
+        if (user.getRole() != Role.ROLE_STUDENT) {
+            errorList.put("userId", "User is not a student");
+        }
+        if (!errorList.isEmpty()) {
+            throw new ResourceBadRequestException("Validation failed", errorList);
+        }
+
+        if (studentRepository.existsById(request.getUserId())) {
+            errorList.put("userId", "Student with this user ID already exists");
+        }
+        if (!errorList.isEmpty()) {
+            throw new ResourceConflictException("Validation failed", errorList);
+        }
+        Student student = Student.builder()
+                .user(user)
+                .studentCode(request.getStudentCode())
+                .major(request.getMajor())
+                .classRoom(request.getClassRoom())
+                .dateOfBirth(request.getDateOfBirth())
+                .address(request.getAddress())
+                .build();
+        studentRepository.save(student);
+
+        return new ApiResponse<>(
+                StudentMapper.toDto(student),
+                true,
+                "Student created successfully",
+                null,
+                LocalDateTime.now()
+        );
+    }
+
+    @Override
+    public PageResponseDTO<StudentResponse> getAllStudent(PageRequestDTO pageRequestDTO) throws ResourceNotFoundException, ResourceForbiddenException {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName(); // lấy username của người dùng hiện tại
+
+        User currentUser = iUserRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+
+        Page<Student> studentPage;
+
+        if (currentUser.getRole() == Role.ROLE_ADMIN) {
+            if (pageRequestDTO.getSortBy() == null || pageRequestDTO.getSortBy().isEmpty()) {
+                pageRequestDTO.setSortBy("studentId");
+            }
+            Pageable pageable = PaginationUtil.createPageRequest(pageRequestDTO);
+            studentPage = studentRepository.findAll(pageable);
+        } else if (currentUser.getRole() == Role.ROLE_MENTOR) {
+            Pageable pageable = PaginationUtil.createPageRequest(pageRequestDTO);
+            studentPage = internshipAssignmentRepository.findStudentsByMentorId(currentUser.getUserId(), pageable);
+        } else {
+            throw new ResourceForbiddenException("Current user does not have permission to view students");
+        }
+        return PaginationUtil.toPageResponseDTO(studentPage, StudentMapper::toDto);
+    }
+
+    @Override
+    public ApiResponse<StudentResponse> getStudentById(Long id) throws ResourceNotFoundException, ResourceForbiddenException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName(); // lấy username của người dùng hiện tại
+
+        User user = iUserRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+
+        if (user.getRole() == Role.ROLE_ADMIN || user.getRole() == Role.ROLE_MENTOR) {
+            Student student = studentRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + id));
+            return new ApiResponse<>(StudentMapper.toDto(student), true, "Student found", null, LocalDateTime.now());
+        }else if (user.getRole() == Role.ROLE_STUDENT) {
+            Student student = studentRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + id));
+            if (!student.getUser().getUserId().equals(user.getUserId())) {
+                throw new ResourceForbiddenException("You cannot view other student's information");
+            }
+            return new ApiResponse<>(StudentMapper.toDto(student), true, "Student found", null, LocalDateTime.now());
+        } else {
+            throw new ResourceForbiddenException("Current user does not have permission to view students");
+        }
+    }
+
+    @Override
+    public ApiResponse<StudentResponse> updateStudent(Long id, StudentUpdateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, ResourceForbiddenException {
+        Map<String, String> errorList = new HashMap<>();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User currentUser = iUserRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+
+        if (currentUser.getRole() == Role.ROLE_ADMIN){
+            Student existingStudent = studentRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + id));
+
+            if (studentRepository.existsByStudentCodeAndStudentIdNot(request.getStudentCode(), id)) {
+                errorList.put("studentCode", "Student code already exists");
+            }
+            if (!errorList.isEmpty()) {
+                throw new ResourceBadRequestException("Validation failed", errorList);
+            }
+
+            StudentMapper.updateFromDto(existingStudent, request);
+            studentRepository.save(existingStudent);
+            return new ApiResponse<>(
+                    StudentMapper.toDto(existingStudent),
+                    true,
+                    "Student updated successfully",
+                    null,
+                    LocalDateTime.now());
+        } else if (currentUser.getRole() == Role.ROLE_STUDENT) {
+            Student existingStudent = studentRepository.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException("Student not found with id: " + id)
+            );
+
+            if (!existingStudent.getUser().getUserId().equals(currentUser.getUserId())){
+                throw new ResourceForbiddenException("You cannot update other student's information");
+            }
+            if (studentRepository.existsByStudentCodeAndStudentIdNot(request.getStudentCode(), id)) {
+                errorList.put("studentCode", "Student code already exists");
+            }
+            if (!errorList.isEmpty()) {
+                throw new ResourceBadRequestException("Validation failed", errorList);
+            }
+
+            StudentMapper.updateFromDto(existingStudent, request);
+            studentRepository.save(existingStudent);
+            return new ApiResponse<>(
+                    StudentMapper.toDto(existingStudent),
+                    true,
+                    "Student updated successfully",
+                    null,
+                    LocalDateTime.now()
+            );
+        }else {
+            throw new ResourceForbiddenException("Current user does not have permission to update students");
+        }
+    }
+}

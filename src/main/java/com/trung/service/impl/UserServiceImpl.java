@@ -1,6 +1,6 @@
 package com.trung.service.impl;
 
-import com.trung.domain.entity.Users;
+import com.trung.domain.entity.User;
 import com.trung.domain.enums.Role;
 import com.trung.dto.request.PageRequestDTO;
 import com.trung.dto.request.UpdateRoleRequest;
@@ -15,7 +15,7 @@ import com.trung.exception.ResourceForbiddenException;
 import com.trung.exception.ResourceNotFoundException;
 import com.trung.mapper.UserMapper;
 import com.trung.repository.IUserRepository;
-import com.trung.service.UserService;
+import com.trung.service.IUserService;
 import com.trung.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,18 +29,17 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements IUserService {
     private final IUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    private final Map<String, String> errorList = new HashMap<>();
 
     @Override
     public PageResponseDTO<UserResponse> getAllProfile(String role, PageRequestDTO pageRequestDTO) throws ResourceBadRequestException {
 
+        Map<String, String> errorList = new HashMap<>();
         Pageable pageable = PaginationUtil.createPageRequest(pageRequestDTO);
 
-        Page<Users> usersPage;
+        Page<User> usersPage;
         Role roleEnum = null;
         if (role != null && !role.isBlank()) {
             try {
@@ -64,13 +63,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiResponse<UserResponse> getProfileById(Long id) throws ResourceConflictException, ResourceNotFoundException {
-        Users users = userRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(id)
+        User users = userRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         return new ApiResponse<>(UserMapper.toDto(users), true, "SUCCESS", null, null);
     }
 
     @Override
     public ApiResponse<UserResponse> createProfile(UserCreateRequest userCreateRequest) throws ResourceConflictException, ResourceBadRequestException {
+        Map<String, String> errorList = new HashMap<>();
         if (userRepository.existsByUsernameAndIsDeletedFalseAndIsActiveTrue(userCreateRequest.getUsername())) {
             errorList.put("username", "Username already exists");
         }
@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService {
             throw new ResourceBadRequestException("BAD_REQUEST", errorList);
         }
 
-        Users users = new Users();
+        User users = new User();
         users.setUsername(userCreateRequest.getUsername());
         users.setPassword(passwordEncoder.encode(userCreateRequest.getPassword()));
         users.setFullName(userCreateRequest.getFullName());
@@ -111,7 +111,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiResponse<UserResponse> updateProfile(Long id, UserUpdateRequest userUpdateRequest) throws ResourceConflictException, ResourceNotFoundException {
-        Users existingUser = userRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(id)
+        Map<String, String> errorList = new HashMap<>();
+        User existingUser = userRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         if (userRepository.existsByUsernameAndIsDeletedFalseAndIsActiveTrueAndUserIdNot(userUpdateRequest.getUsername(), id)) {
             errorList.put("username", "Username already exists");
@@ -130,7 +131,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiResponse<UserResponse> updateStatus(Long id) throws ResourceConflictException, ResourceNotFoundException {
-        Users users = userRepository.findByUserIdAndIsDeletedFalse(id)
+        User users = userRepository.findByUserIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
         users.setActive(!users.isActive());
@@ -140,7 +141,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiResponse<UserResponse> updateRole(Long id, UpdateRoleRequest request) throws ResourceConflictException, ResourceNotFoundException, ResourceForbiddenException, ResourceBadRequestException {
-        Users users = userRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(id)
+        Map<String, String> errorList = new HashMap<>();
+        User users = userRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
         Role roleEnum = null;
@@ -166,7 +168,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiResponse<String> deleteProfile(Long id) throws ResourceConflictException, ResourceNotFoundException {
-        Users users = userRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(id)
+        User users = userRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
         users.setDeleted(true);

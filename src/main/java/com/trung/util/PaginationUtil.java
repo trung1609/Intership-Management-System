@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -15,13 +16,25 @@ public class PaginationUtil {
 
     public static Pageable createPageRequest(PageRequestDTO pageRequestDTO) {
 
-        List<String> allowedSortFields = List.of("userId", "username", "email", "fullName", "role", "createdAt", "updatedAt"); // Danh sách các trường được phép sort
+        // Danh sách các trường được phép sort cho User entity
+        List<String> userAllowedSortFields = List.of("userId", "username", "email", "fullName", "role", "createdAt", "updatedAt");
+        // Danh sách các trường được phép sort cho Student entity
+        List<String> studentAllowedSortFields = List.of("studentId", "studentCode", "major", "classRoom", "dateOfBirth", "address", "createdAt", "updatedAt");
+        // Danh sách các trường được phép sort cho Assignment entity
+        List<String> assignmentAllowedSortFields = List.of("assignmentId", "student", "mentor", "status", "createdAt", "updatedAt");
 
         int page = pageRequestDTO.getPage() != null && pageRequestDTO.getPage() > 0 ? pageRequestDTO.getPage() : 0;
         int size = pageRequestDTO.getSize() != null && pageRequestDTO.getSize() > 0 ? pageRequestDTO.getSize() : 10;
-        String sortBy = pageRequestDTO.getSortBy() != null && allowedSortFields.contains(pageRequestDTO.getSortBy())
+
+
+        List<String> allAllowedFields = new ArrayList<>();
+        allAllowedFields.addAll(userAllowedSortFields);
+        allAllowedFields.addAll(studentAllowedSortFields);
+        allAllowedFields.addAll(assignmentAllowedSortFields);
+        
+        String sortBy = pageRequestDTO.getSortBy() != null && allAllowedFields.contains(pageRequestDTO.getSortBy())
                 ? pageRequestDTO.getSortBy()
-                : "userId";
+                : "createdAt";
 
         Sort.Direction direction;
         try {

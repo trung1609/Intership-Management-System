@@ -12,7 +12,7 @@ import com.trung.exception.ResourceConflictException;
 import com.trung.exception.ResourceForbiddenException;
 import com.trung.exception.ResourceNotFoundException;
 
-public interface UserService {
+public interface IUserService {
     PageResponseDTO<UserResponse> getAllProfile(String role, PageRequestDTO pageRequestDTO) throws ResourceConflictException, ResourceBadRequestException;
     ApiResponse<UserResponse> getProfileById(Long id) throws ResourceConflictException, ResourceNotFoundException;
     ApiResponse<UserResponse> createProfile(UserCreateRequest userCreateRequest) throws ResourceConflictException, ResourceBadRequestException;

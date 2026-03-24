@@ -1,12 +1,12 @@
 package com.trung.mapper;
 
-import com.trung.domain.entity.Users;
+import com.trung.domain.entity.User;
 import com.trung.domain.enums.Role;
 import com.trung.dto.request.UserUpdateRequest;
 import com.trung.dto.response.UserResponse;
 
 public class UserMapper {
-    public static UserResponse toDto(Users users){
+    public static UserResponse toDto(User users){
         return UserResponse.builder()
                 .userId(users.getUserId())
                 .username(users.getUsername())
@@ -16,8 +16,8 @@ public class UserMapper {
                 .build();
     }
 
-    public static Users toEntity(UserResponse userResponse){
-        return Users.builder()
+    public static User toEntity(UserResponse userResponse){
+        return User.builder()
                 .userId(userResponse.getUserId())
                 .username(userResponse.getUsername())
                 .fullName(userResponse.getFullName())
@@ -26,7 +26,7 @@ public class UserMapper {
                 .build();
     }
 
-    public static void updateFromDto(Users users, UserUpdateRequest userUpdateRequest){
+    public static void updateFromDto(User users, UserUpdateRequest userUpdateRequest){
         if (userUpdateRequest.getUsername() != null && !userUpdateRequest.getUsername().isBlank()){
             users.setUsername(userUpdateRequest.getUsername());
         }

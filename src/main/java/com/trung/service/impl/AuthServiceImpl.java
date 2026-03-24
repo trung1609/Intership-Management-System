@@ -1,10 +1,9 @@
 package com.trung.service.impl;
 
-import com.trung.domain.entity.Users;
+import com.trung.domain.entity.User;
 import com.trung.domain.enums.Role;
 import com.trung.dto.request.FormLoginRequest;
 import com.trung.dto.request.FormRegisterRequest;
-import com.trung.dto.request.PageRequestDTO;
 import com.trung.dto.response.*;
 import com.trung.exception.InvalidCredentialsException;
 import com.trung.exception.ResourceConflictException;
@@ -13,12 +12,9 @@ import com.trung.mapper.UserMapper;
 import com.trung.repository.IUserRepository;
 import com.trung.security.jwt.JwtProvider;
 import com.trung.security.principal.UserPrincipal;
-import com.trung.service.AuthService;
-import com.trung.util.PaginationUtil;
+import com.trung.service.IAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,7 +27,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService {
+public class AuthServiceImpl implements IAuthService {
     private final IUserRepository userRepository;
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
@@ -53,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
             throw new ResourceConflictException("CONFLICT_RESOURCE", errorList);
         }
 
-        Users users = new Users();
+        User users = new User();
         users.setUsername(request.getUsername());
         users.setPassword(passwordEncoder.encode(request.getPassword()));
         users.setFullName(request.getFullName());
@@ -82,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-            Users users = userPrincipal.getUsers();
+            User users = userPrincipal.getUsers();
 
             Date expireDate = new Date(new Date().getTime() + expire);
 
@@ -101,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ApiResponse<UserResponse> getMyProfile(String username) throws ResourceNotFoundException {
-        Users users = userRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
+        User users = userRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
         return new ApiResponse<>(UserMapper.toDto(users), true, "SUCCESS", null, LocalDateTime.now());
     }
