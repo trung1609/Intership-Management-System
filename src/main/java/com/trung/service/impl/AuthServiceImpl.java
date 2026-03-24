@@ -23,7 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -38,16 +38,6 @@ public class AuthServiceImpl implements IAuthService {
 
     @Override
     public ApiResponse<RegisterResponse> register(FormRegisterRequest request) throws ResourceConflictException {
-        Map<String, String> errorList = new HashMap<>();
-        if (userRepository.existsByUsernameAndIsDeletedFalseAndIsActiveTrue(request.getUsername())) {
-            errorList.put("username", "Username is already taken");
-        }
-        if (userRepository.existsByEmailAndIsDeletedFalseAndIsActiveTrue(request.getEmail())) {
-            errorList.put("email", "Email is already taken");
-        }
-        if (!errorList.isEmpty()) {
-            throw new ResourceConflictException("CONFLICT_RESOURCE", errorList);
-        }
 
         User users = new User();
         users.setUsername(request.getUsername());

@@ -25,6 +25,8 @@ public class PaginationUtil {
         // Danh sách các trường được phép sort cho Mentor
         List<String> mentorAllowedSortFields = List.of("mentorId", "department", "academicRank", "createdAt", "updatedAt");
 
+        List<String> internshipPhaseAllowedSortFields = List.of("phaseId", "phaseName", "description", "createdAt", "updatedAt");
+
         int page = pageRequestDTO.getPage() != null && pageRequestDTO.getPage() > 0 ? pageRequestDTO.getPage() : 0;
         int size = pageRequestDTO.getSize() != null && pageRequestDTO.getSize() > 0 ? pageRequestDTO.getSize() : 10;
 
