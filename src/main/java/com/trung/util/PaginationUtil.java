@@ -24,8 +24,14 @@ public class PaginationUtil {
         List<String> assignmentAllowedSortFields = List.of("assignmentId", "student", "mentor", "status", "createdAt", "updatedAt");
         // Danh sách các trường được phép sort cho Mentor
         List<String> mentorAllowedSortFields = List.of("mentorId", "department", "academicRank", "createdAt", "updatedAt");
-
+        // Danh sách các trường được phép sort cho InternshipPhase
         List<String> internshipPhaseAllowedSortFields = List.of("phaseId", "phaseName", "description", "createdAt", "updatedAt");
+
+        // Danh sach các trường được phép sort cho EvaluationCriteria
+        List<String> evaluationAllowedSortFields = List.of("criterionId", "criterionName", "maxScore", "description", "createdAt", "updatedAt");
+
+        // Danh sách các trường được sort cho AssessmentRound
+        List<String> assessmentRoundAllowedSortFields = List.of("roundId", "phase", "roundName", "startDate", "endDate", "description", "createdAt", "updatedAt");
 
         int page = pageRequestDTO.getPage() != null && pageRequestDTO.getPage() > 0 ? pageRequestDTO.getPage() : 0;
         int size = pageRequestDTO.getSize() != null && pageRequestDTO.getSize() > 0 ? pageRequestDTO.getSize() : 10;
@@ -36,7 +42,10 @@ public class PaginationUtil {
         allAllowedFields.addAll(studentAllowedSortFields);
         allAllowedFields.addAll(assignmentAllowedSortFields);
         allAllowedFields.addAll(mentorAllowedSortFields);
-        
+        allAllowedFields.addAll(internshipPhaseAllowedSortFields);
+        allAllowedFields.addAll(evaluationAllowedSortFields);
+        allAllowedFields.addAll(assessmentRoundAllowedSortFields);
+
         String sortBy = pageRequestDTO.getSortBy() != null && allAllowedFields.contains(pageRequestDTO.getSortBy())
                 ? pageRequestDTO.getSortBy()
                 : "createdAt";

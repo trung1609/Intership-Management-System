@@ -1,7 +1,7 @@
 package com.trung.validation;
 
 import com.trung.exception.ResourceConflictException;
-import com.trung.repository.InternshipPhaseRepository;
+import com.trung.repository.IStudentRepository;
 import com.trung.util.ValidationErrorUtil;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -12,23 +12,20 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class UniquePhaseNameValidator implements ConstraintValidator<UniquePhaseName, String> {
-    private final InternshipPhaseRepository internshipPhaseRepository;
-
+public class UniqueStudentCodeValidator implements ConstraintValidator<UniqueStudentCode, String> {
+    private final IStudentRepository studentRepository;
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         if (value == null || value.isBlank()) {
             return true;
         }
-        
 
-        String normalizedValue = value.trim().replaceAll("\\s+", " ");
-        
-        boolean exists = internshipPhaseRepository.existsByPhaseNameIgnoreCaseAndIsDeletedFalse(normalizedValue);
-        
-        if (exists) {
-            ValidationErrorUtil.addError(errorList, "phaseName", "Internship phase already exists");
+        String normalizedValue = value.replaceAll("\\s+", "").toUpperCase().trim();
+        boolean exist = studentRepository.existsByStudentCode(normalizedValue);
+
+        if (exist) {
+            ValidationErrorUtil.addError(errorList, "studentCode", "Student code already exists");
         }
 
         if(ValidationErrorUtil.hasErrors(errorList)) {
@@ -38,7 +35,11 @@ public class UniquePhaseNameValidator implements ConstraintValidator<UniquePhase
                 throw new RuntimeException(e);
             }
         }
-        return !exists;
-    }
-}
 
+        return !exist;
+    }
+
+
+
+
+}

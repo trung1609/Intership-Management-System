@@ -8,7 +8,6 @@ import com.trung.dto.response.MentorResponse;
 public class MentorMapper {
     public static MentorResponse toDto(Mentor mentor){
         return MentorResponse.builder()
-                .mentorId(mentor.getMentorId())
                 .department(mentor.getDepartment())
                 .academicRank(mentor.getAcademicRank())
                 .fullName(mentor.getUser().getFullName())

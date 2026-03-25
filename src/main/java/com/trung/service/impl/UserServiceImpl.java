@@ -17,6 +17,7 @@ import com.trung.mapper.UserMapper;
 import com.trung.repository.IUserRepository;
 import com.trung.service.IUserService;
 import com.trung.util.PaginationUtil;
+import com.trung.util.ValidationErrorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +37,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public PageResponseDTO<UserResponse> getAllProfile(String role, PageRequestDTO pageRequestDTO) throws ResourceBadRequestException {
 
-        Map<String, String> errorList = new HashMap<>();
+        Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         Pageable pageable = PaginationUtil.createPageRequest(pageRequestDTO);
 
         Page<User> usersPage;
@@ -45,10 +46,10 @@ public class UserServiceImpl implements IUserService {
             try {
                 roleEnum = Role.valueOf(role.toUpperCase());
             } catch (IllegalArgumentException e) {
-                errorList.put("role", "Invalid role value");
+                ValidationErrorUtil.addError(errorList, "role", "Invalid role value");
             }
         }
-        if (!errorList.isEmpty()) {
+        if (ValidationErrorUtil.hasErrors(errorList)) {
             throw new ResourceBadRequestException("BAD_REQUEST", errorList);
         }
 
@@ -71,20 +72,22 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ApiResponse<UserResponse> createProfile(UserCreateRequest userCreateRequest) throws ResourceConflictException, ResourceBadRequestException {
         Role roleEnum = null;
-        Map<String, String> errorList = new HashMap<>();
+        Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         
         if (userCreateRequest.getRole() != null && !userCreateRequest.getRole().isBlank()) {
             try {
                 roleEnum = Role.valueOf(userCreateRequest.getRole().toUpperCase());
             } catch (IllegalArgumentException e) {
-                errorList.put("role", "Invalid role value");
+                ValidationErrorUtil.addError(errorList, "role", "Invalid role value");
             }
         }
-        if (!errorList.isEmpty()) {
+
+        if (ValidationErrorUtil.hasErrors(errorList)) {
             throw new ResourceBadRequestException("BAD_REQUEST", errorList);
         }
 
         User users = new User();
+
         users.setUsername(userCreateRequest.getUsername());
         users.setPassword(passwordEncoder.encode(userCreateRequest.getPassword()));
         users.setFullName(userCreateRequest.getFullName());
@@ -105,7 +108,7 @@ public class UserServiceImpl implements IUserService {
         Map<String, String> errorList = new HashMap<>();
         User existingUser = userRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        if (userRepository.existsByUsernameAndIsDeletedFalseAndIsActiveTrueAndUserIdNot(userUpdateRequest.getUsername(), id)) {
+        if (userRepository.existsByUsernameAndUserIdNot(userUpdateRequest.getUsername(), id)) {
             errorList.put("username", "Username already exists");
         }
 

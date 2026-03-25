@@ -1,12 +1,13 @@
 package com.trung.domain.entity;
 
-import com.trung.domain.enums.AssignmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 
 @Entity
 @Getter
@@ -14,31 +15,29 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class InternshipAssignment {
+@Table(name = "round_criteria",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"round_id", "criterion_id"}))
+public class RoundCriteria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long assignmentId;
+    private Long roundCriteriaId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id")
-    private Student student;
+    @JoinColumn(name = "round_id", nullable = false)
+    private AssessmentRound round;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mentor_id")
-    private Mentor mentor;
+    @JoinColumn(name = "criterion_id", nullable = false)
+    private EvaluationCriteria criterion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "phase_id")
-    private InternshipPhase internshipPhase;
-
-    private LocalDateTime assignedDate;
-
-    @Enumerated(EnumType.STRING)
-    private AssignmentStatus status;
+    @Column(nullable = false)
+    private BigDecimal weight;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    private boolean isDeleted = false;
 }

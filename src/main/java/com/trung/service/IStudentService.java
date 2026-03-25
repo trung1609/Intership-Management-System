@@ -7,14 +7,11 @@ import com.trung.dto.request.UpdateRoleRequest;
 import com.trung.dto.response.ApiResponse;
 import com.trung.dto.response.PageResponseDTO;
 import com.trung.dto.response.StudentResponse;
-import com.trung.exception.ResourceBadRequestException;
-import com.trung.exception.ResourceConflictException;
-import com.trung.exception.ResourceForbiddenException;
-import com.trung.exception.ResourceNotFoundException;
+import com.trung.exception.*;
 
 public interface IStudentService {
-    ApiResponse<StudentResponse> createStudent(StudentCreateRequest request) throws ResourceConflictException, ResourceNotFoundException, ResourceBadRequestException;
+    ApiResponse<StudentResponse> createStudent(StudentCreateRequest request) throws ResourceConflictException, ResourceNotFoundException, ResourceBadRequestException, InvalidDateFormatException;
     PageResponseDTO<StudentResponse> getAllStudent(PageRequestDTO pageRequestDTO) throws ResourceNotFoundException, ResourceForbiddenException;
     ApiResponse<StudentResponse> getStudentById(Long id) throws ResourceNotFoundException, ResourceForbiddenException;
-    ApiResponse<StudentResponse> updateStudent(Long id, StudentUpdateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, ResourceForbiddenException;
+    ApiResponse<StudentResponse> updateStudent(Long id, StudentUpdateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, ResourceForbiddenException, ResourceConflictException, InvalidDateFormatException;
 }

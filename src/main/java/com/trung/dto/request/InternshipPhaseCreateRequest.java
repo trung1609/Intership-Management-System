@@ -5,8 +5,8 @@ import com.google.errorprone.annotations.FormatMethod;
 import com.trung.validation.UniquePhaseName;
 import com.trung.validation.ValidDateRange;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
-import org.hibernate.annotations.processing.Pattern;
 
 import java.time.LocalDate;
 
@@ -19,13 +19,14 @@ import java.time.LocalDate;
 public class InternshipPhaseCreateRequest {
     @NotBlank(message = "Phase name is required")
     @UniquePhaseName
+    @Pattern(regexp = "^[\\p{L}0-9]+(\\s[\\p{L}0-9]+)*$", message = "Phase name must contain only letters and numbers, and cannot have leading or trailing spaces")
     private String phaseName;
 
-    @JsonFormat(pattern = "dd/MM/yyyy")
-    private LocalDate startDate;
+    @NotBlank(message = "Start date is required")
+    private String startDate;
 
-    @JsonFormat(pattern = "dd/MM/yyyy")
-    private LocalDate endDate;
+    @NotBlank(message = "End date is required")
+    private String endDate;
 
 
     private String description;

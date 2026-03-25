@@ -6,10 +6,7 @@ import com.trung.dto.request.StudentUpdateRequest;
 import com.trung.dto.response.ApiResponse;
 import com.trung.dto.response.PageResponseDTO;
 import com.trung.dto.response.StudentResponse;
-import com.trung.exception.ResourceBadRequestException;
-import com.trung.exception.ResourceConflictException;
-import com.trung.exception.ResourceForbiddenException;
-import com.trung.exception.ResourceNotFoundException;
+import com.trung.exception.*;
 import com.trung.service.IStudentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +23,7 @@ public class StudentController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse<StudentResponse>> createStudent(@Valid @RequestBody StudentCreateRequest request) throws ResourceConflictException, ResourceNotFoundException, ResourceBadRequestException {
+    public ResponseEntity<ApiResponse<StudentResponse>> createStudent(@Valid @RequestBody StudentCreateRequest request) throws ResourceConflictException, ResourceNotFoundException, ResourceBadRequestException, InvalidDateFormatException {
         return new ResponseEntity<>(studentService.createStudent(request), org.springframework.http.HttpStatus.CREATED);
     }
 
@@ -43,7 +40,7 @@ public class StudentController {
 
     @PutMapping("/{studentId}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_STUDENT')")
-    public ResponseEntity<ApiResponse<StudentResponse>> updateStudent(@PathVariable Long studentId, @Valid @RequestBody StudentUpdateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, ResourceForbiddenException {
+    public ResponseEntity<ApiResponse<StudentResponse>> updateStudent(@PathVariable Long studentId, @Valid @RequestBody StudentUpdateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, ResourceForbiddenException, ResourceConflictException, InvalidDateFormatException {
         return new ResponseEntity<>(studentService.updateStudent(studentId, request), HttpStatus.OK);
     }
 }

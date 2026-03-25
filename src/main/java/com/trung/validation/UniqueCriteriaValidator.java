@@ -1,7 +1,7 @@
 package com.trung.validation;
 
 import com.trung.exception.ResourceConflictException;
-import com.trung.repository.InternshipPhaseRepository;
+import com.trung.repository.IEvaluationCriteriaRepository;
 import com.trung.util.ValidationErrorUtil;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -12,8 +12,9 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class UniquePhaseNameValidator implements ConstraintValidator<UniquePhaseName, String> {
-    private final InternshipPhaseRepository internshipPhaseRepository;
+public class UniqueCriteriaValidator implements ConstraintValidator<UniqueCriteria, String> {
+
+    private final IEvaluationCriteriaRepository evaluationCriteriaRepository;
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
@@ -21,14 +22,12 @@ public class UniquePhaseNameValidator implements ConstraintValidator<UniquePhase
         if (value == null || value.isBlank()) {
             return true;
         }
-        
 
         String normalizedValue = value.trim().replaceAll("\\s+", " ");
-        
-        boolean exists = internshipPhaseRepository.existsByPhaseNameIgnoreCaseAndIsDeletedFalse(normalizedValue);
-        
-        if (exists) {
-            ValidationErrorUtil.addError(errorList, "phaseName", "Internship phase already exists");
+        boolean exist = evaluationCriteriaRepository.existsByCriterionNameIgnoreCaseAndIsDeletedFalse(normalizedValue);
+
+        if (exist) {
+            ValidationErrorUtil.addError(errorList, "criterionName", "Evaluation criteria already exists");
         }
 
         if(ValidationErrorUtil.hasErrors(errorList)) {
@@ -38,7 +37,7 @@ public class UniquePhaseNameValidator implements ConstraintValidator<UniquePhase
                 throw new RuntimeException(e);
             }
         }
-        return !exists;
+
+        return !exist;
     }
 }
-

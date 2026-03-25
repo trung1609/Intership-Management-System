@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -73,6 +72,7 @@ public class GlobalExceptionHandler {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(ResourceForbiddenException.class)
     public ResponseEntity<ApiResponse<Object>> handleResourceForbiddenException(ResourceForbiddenException ex) {
         ApiResponse<Object> response = ApiResponse.builder()
@@ -85,8 +85,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiResponse<Object>> handleInvalidFormat(HttpMessageNotReadableException ex) {
+    @ExceptionHandler(InvalidDateFormatException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidFormat(InvalidDateFormatException ex) {
         return ResponseEntity.badRequest().body(
                 new ApiResponse<>(null, false, "Invalid date format, please use dd/MM/yyyy", null, LocalDateTime.now())
         );
@@ -105,5 +105,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
-
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Object>> handleGeneralException(HttpMessageNotReadableException ex) {
+        ApiResponse<Object> response = ApiResponse.builder()
+                .success(false)
+                .message("INTERNAL_SERVER_ERROR")
+                .data(null)
+                .error(Map.of("error", ex.getMessage()))
+                .timestamp(LocalDateTime.now())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

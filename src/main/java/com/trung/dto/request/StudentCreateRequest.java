@@ -1,9 +1,13 @@
 package com.trung.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.trung.validation.UniqueStudentCode;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -17,6 +21,8 @@ public class StudentCreateRequest {
     private Long userId;
 
     @NotBlank(message = "Student code is required")
+    @UniqueStudentCode
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Student code must contain only letters, numbers, and underscores")
     public String studentCode;
 
     @NotBlank(message = "Major is required")
@@ -26,7 +32,7 @@ public class StudentCreateRequest {
     public String classRoom;
 
     @NotNull(message = "Date of birth is required")
-    public Date dateOfBirth;
+    public String dateOfBirth;
 
     @NotBlank(message = "Address is required")
     public String address;

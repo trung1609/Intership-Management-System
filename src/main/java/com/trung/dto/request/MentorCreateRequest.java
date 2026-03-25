@@ -2,6 +2,7 @@ package com.trung.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 @Getter
@@ -17,5 +18,6 @@ public class MentorCreateRequest {
     private String department;
 
     @NotBlank(message = "Academic rank is required")
+    @Pattern(regexp = "^[\\p{L}\\s]+$", message = "Academic rank must contain only letters and spaces")
     private String academicRank;
 }

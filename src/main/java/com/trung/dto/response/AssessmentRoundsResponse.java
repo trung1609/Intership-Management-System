@@ -4,14 +4,16 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class InternshipPhaseResponse {
+public class AssessmentRoundsResponse {
     private String phaseName;
+    private String roundName;
 
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate startDate;
@@ -19,4 +21,6 @@ public class InternshipPhaseResponse {
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate endDate;
     private String description;
+
+    private List<RoundCriterionResponse> roundCriteria;
 }

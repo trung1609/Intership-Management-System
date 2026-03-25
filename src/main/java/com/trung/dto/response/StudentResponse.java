@@ -1,7 +1,9 @@
 package com.trung.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -10,7 +12,6 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class StudentResponse {
-    public Long studentId;
 
     private String fullName;
 
@@ -24,7 +25,8 @@ public class StudentResponse {
 
     public String classRoom;
 
-    public Date dateOfBirth;
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    public LocalDate dateOfBirth;
 
     public String address;
 }

@@ -8,21 +8,10 @@ import com.trung.dto.response.UserResponse;
 public class UserMapper {
     public static UserResponse toDto(User users){
         return UserResponse.builder()
-                .userId(users.getUserId())
                 .username(users.getUsername())
                 .fullName(users.getFullName())
                 .email(users.getEmail())
                 .role(users.getRole().name())
-                .build();
-    }
-
-    public static User toEntity(UserResponse userResponse){
-        return User.builder()
-                .userId(userResponse.getUserId())
-                .username(userResponse.getUsername())
-                .fullName(userResponse.getFullName())
-                .email(userResponse.getEmail())
-                .role(Role.valueOf(userResponse.getRole()))
                 .build();
     }
 

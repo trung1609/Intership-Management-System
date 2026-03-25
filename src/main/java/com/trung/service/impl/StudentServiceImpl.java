@@ -9,16 +9,14 @@ import com.trung.dto.request.StudentUpdateRequest;
 import com.trung.dto.response.ApiResponse;
 import com.trung.dto.response.PageResponseDTO;
 import com.trung.dto.response.StudentResponse;
-import com.trung.exception.ResourceBadRequestException;
-import com.trung.exception.ResourceConflictException;
-import com.trung.exception.ResourceForbiddenException;
-import com.trung.exception.ResourceNotFoundException;
+import com.trung.exception.*;
 import com.trung.mapper.StudentMapper;
 import com.trung.repository.IStudentRepository;
 import com.trung.repository.IUserRepository;
 import com.trung.repository.InternshipAssignmentRepository;
 import com.trung.service.IStudentService;
 import com.trung.util.PaginationUtil;
+import com.trung.util.ValidationErrorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,31 +37,31 @@ public class StudentServiceImpl implements IStudentService {
     private final InternshipAssignmentRepository internshipAssignmentRepository;
 
     @Override
-    public ApiResponse<StudentResponse> createStudent(StudentCreateRequest request) throws ResourceConflictException, ResourceNotFoundException, ResourceBadRequestException {
-        Map<String, String> errorList = new HashMap<>();
+    public ApiResponse<StudentResponse> createStudent(StudentCreateRequest request) throws ResourceConflictException, ResourceNotFoundException, ResourceBadRequestException, InvalidDateFormatException {
+        Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         User user = iUserRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(request.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + request.getUserId()));
 
         if (user.getRole() != Role.ROLE_STUDENT) {
             errorList.put("userId", "User is not a student");
         }
+
+
+        if (ValidationErrorUtil.hasErrors(errorList)) {
+            throw new InvalidDateFormatException("Validation failed");
+        }
         
         if (studentRepository.existsById(request.getUserId())) {
             errorList.put("userId", "Student with this user ID already exists");
         }
         
-        if (!errorList.isEmpty()) {
+        if (ValidationErrorUtil.hasErrors(errorList)) {
             throw new ResourceBadRequestException("Validation failed", errorList);
         }
-        
-        Student student = Student.builder()
-                .user(user)
-                .studentCode(request.getStudentCode())
-                .major(request.getMajor())
-                .classRoom(request.getClassRoom())
-                .dateOfBirth(request.getDateOfBirth())
-                .address(request.getAddress())
-                .build();
+
+        Student student = new Student();
+        student.setUser(user);
+        StudentMapper.toEntity(student, request);
         studentRepository.save(student);
 
         return new ApiResponse<>(
@@ -125,8 +124,8 @@ public class StudentServiceImpl implements IStudentService {
     }
 
     @Override
-    public ApiResponse<StudentResponse> updateStudent(Long id, StudentUpdateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, ResourceForbiddenException {
-        Map<String, String> errorList = new HashMap<>();
+    public ApiResponse<StudentResponse> updateStudent(Long id, StudentUpdateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, ResourceForbiddenException, ResourceConflictException, InvalidDateFormatException {
+        Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
@@ -137,14 +136,14 @@ public class StudentServiceImpl implements IStudentService {
             Student existingStudent = studentRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + id));
             if (iUserRepository.existsByEmailAndIsDeletedFalseAndIsActiveTrueAndUserIdNot(request.getEmail(), existingStudent.getUser().getUserId())) {
-                errorList.put("email", "Email already exists");
+                ValidationErrorUtil.addError(errorList, "email", "Email already exists");
             }
 
             if (studentRepository.existsByStudentCodeAndStudentIdNot(request.getStudentCode(), id)) {
-                errorList.put("studentCode", "Student code already exists");
+                ValidationErrorUtil.addError(errorList, "studentCode", "Student code already exists");
             }
-            if (!errorList.isEmpty()) {
-                throw new ResourceBadRequestException("Validation failed", errorList);
+            if (ValidationErrorUtil.hasErrors(errorList)) {
+                throw new ResourceConflictException("Validation failed", errorList);
             }
 
             StudentMapper.updateFromDto(existingStudent, request);
@@ -164,14 +163,14 @@ public class StudentServiceImpl implements IStudentService {
             }
 
             if (iUserRepository.existsByEmailAndIsDeletedFalseAndIsActiveTrueAndUserIdNot(request.getEmail(), existingStudent.getUser().getUserId())) {
-                errorList.put("email", "Email already exists");
+                ValidationErrorUtil.addError(errorList, "email", "Email already exists");
             }
 
             if (studentRepository.existsByStudentCodeAndStudentIdNot(request.getStudentCode(), id)) {
-                errorList.put("studentCode", "Student code already exists");
+                ValidationErrorUtil.addError(errorList, "studentCode", "Student code already exists");
             }
-            if (!errorList.isEmpty()) {
-                throw new ResourceBadRequestException("Validation failed", errorList);
+            if (ValidationErrorUtil.hasErrors(errorList)) {
+                throw new ResourceConflictException("Validation failed", errorList);
             }
 
             StudentMapper.updateFromDto(existingStudent, request);
