@@ -18,4 +18,6 @@ public class RoundCriterionCreateRequest {
     @NotNull(message = "Weight is required.")
     @Positive(message = "Weight must be a positive number.")
     private BigDecimal weight;
+
+    private Long roundId;
 }

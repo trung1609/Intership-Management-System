@@ -10,6 +10,7 @@ public class RoundCriteriaMapper {
                 .criterionName(rc.getCriterion().getCriterionName())
                 .weight(rc.getWeight())
                 .maxScore(rc.getCriterion().getMaxScore())
+                .roundName(rc.getRound().getRoundName())
                 .build();
     }
 

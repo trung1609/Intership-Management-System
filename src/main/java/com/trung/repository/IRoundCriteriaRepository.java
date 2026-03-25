@@ -2,6 +2,8 @@ package com.trung.repository;
 
 import com.trung.domain.entity.AssessmentRound;
 import com.trung.domain.entity.RoundCriteria;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,13 +14,22 @@ import java.util.Optional;
 
 @Repository
 public interface IRoundCriteriaRepository extends JpaRepository<RoundCriteria, Long> {
+
+
+    @Query("select count(rc) > 0 from RoundCriteria rc where " +
+            "rc.criterion.criterionId = :criterionId and rc.round.roundId = :roundId " +
+            " and rc.isDeleted = false and " +
+            "rc.criterion.isDeleted = false and rc.round.isDeleted = false ")
+    boolean existsByCriterionAndRound(@Param("roundId") Long roundId,  @Param("criterionId") Long criterionId);
+
+    Optional<RoundCriteria> findByRound_RoundIdAndRound_IsDeletedFalse(Long roundId);
+
     @Query("select rc from RoundCriteria rc where " +
-            "rc.round.roundId = :roundId " +
-            "and rc.criterion.criterionId = :criterionId " +
-            "and rc.isDeleted = false " +
-            "and rc.round.isDeleted = false " +
-            "and rc.criterion.isDeleted = false")
-    Optional<RoundCriteria> findByRoundIdAndCriterionId(@Param("roundId") Long roundId,@Param("criterionId") Long criterionId);
+            "rc.roundCriteriaId = :roundCriteriaId and " +
+            "rc.isDeleted = false and " +
+            "rc.criterion.isDeleted = false and " +
+            "rc.round.isDeleted = false")
+    Optional<RoundCriteria> findByRoundCriteriaIdAndIsDeletedFalse(Long roundCriteriaId);
 
     @Query("select case when count(rc) > 0 then true else false end from RoundCriteria rc where " +
             "rc.round.roundId = :roundId " +
@@ -28,4 +39,6 @@ public interface IRoundCriteriaRepository extends JpaRepository<RoundCriteria, L
             "and rc.criterion.isDeleted = false")
     boolean existsByRoundIdAndCriterionId(Long roundId, Long criterionId);
 
+
+    Page<RoundCriteria> findAllByRound_RoundIdAndIsDeletedFalseAndRound_IsDeletedFalseAndCriterion_IsDeletedFalse(Long roundId, Pageable pageable);
 }

@@ -33,6 +33,8 @@ public class PaginationUtil {
         // Danh sách các trường được sort cho AssessmentRound
         List<String> assessmentRoundAllowedSortFields = List.of("roundId", "phase", "roundName", "startDate", "endDate", "description", "createdAt", "updatedAt");
 
+        List<String> roundCriteriaAllowedSortFields = List.of("roundCriteriaId", "round", "criterion", "weight", "createdAt", "updatedAt");
+
         int page = pageRequestDTO.getPage() != null && pageRequestDTO.getPage() > 0 ? pageRequestDTO.getPage() : 0;
         int size = pageRequestDTO.getSize() != null && pageRequestDTO.getSize() > 0 ? pageRequestDTO.getSize() : 10;
 
@@ -45,6 +47,7 @@ public class PaginationUtil {
         allAllowedFields.addAll(internshipPhaseAllowedSortFields);
         allAllowedFields.addAll(evaluationAllowedSortFields);
         allAllowedFields.addAll(assessmentRoundAllowedSortFields);
+        allAllowedFields.addAll(roundCriteriaAllowedSortFields);
 
         String sortBy = pageRequestDTO.getSortBy() != null && allAllowedFields.contains(pageRequestDTO.getSortBy())
                 ? pageRequestDTO.getSortBy()
