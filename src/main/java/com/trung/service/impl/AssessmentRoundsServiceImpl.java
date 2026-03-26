@@ -58,8 +58,6 @@ public class AssessmentRoundsServiceImpl implements IAssessmentRoundsService {
 
             if (!uniqueCriterionIds.add(req.getCriterionId())) {
                 ValidationErrorUtil.addError(errorList, "roundCriteria", "Duplicate criterion ID");
-            }
-            if (ValidationErrorUtil.hasErrors(errorList)) {
                 throw new ResourceConflictException("Validation failed", errorList);
             }
 
@@ -120,26 +118,6 @@ public class AssessmentRoundsServiceImpl implements IAssessmentRoundsService {
                 .orElseThrow(() -> new ResourceNotFoundException("Assessment round not found with id: " + id));
 
         AssessmentRoundsMapper.updateFromDto(assessmentRound, request);
-
-//        Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
-//
-//        Set<Long> uniqueCriterionIds = new HashSet<>();
-//        if (assessmentRound.getRoundCriteriaList() != null) {
-//            for(RoundCriterionUpdateRequest req : request.getCriteria()){
-//                RoundCriteria roundCriteria = roundCriteriaRepository.findByRoundIdAndCriterionId(req.getCriterionId(), id)
-//                        .orElseThrow(() -> new ResourceNotFoundException("Round criteria not found with id: " + req.getCriterionId()));
-//
-//                if (!uniqueCriterionIds.add(req.getCriterionId())) {
-//                    ValidationErrorUtil.addError(errorList, "roundCriteria", "Duplicate criterion ID");
-//                }
-//                if (ValidationErrorUtil.hasErrors(errorList)) {
-//                    throw new ResourceConflictException("Validation failed", errorList);
-//                }
-//
-//                roundCriteria.setWeight(req.getWeight());
-//                roundCriteriaRepository.save(roundCriteria);
-//            }
-//        }
 
         assessmentRoundsRepository.save(assessmentRound);
         return new ApiResponse<>(AssessmentRoundsMapper.toDto(assessmentRound),

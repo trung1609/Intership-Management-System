@@ -15,6 +15,7 @@ import lombok.*;
 public class FormRegisterRequest {
     @NotBlank(message = "Username is required")
     @UniqueUsername
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Username must contain only letters, numbers, and underscores")
     private String username;
 
     @NotBlank(message = "Password is required")

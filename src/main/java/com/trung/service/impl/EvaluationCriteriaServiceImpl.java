@@ -13,6 +13,7 @@ import com.trung.mapper.EvaluationCriteriaMapper;
 import com.trung.repository.IEvaluationCriteriaRepository;
 import com.trung.service.IEvaluationCriteriaService;
 import com.trung.util.PaginationUtil;
+import com.trung.util.ValidationErrorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -73,15 +74,13 @@ public class EvaluationCriteriaServiceImpl implements IEvaluationCriteriaService
 
     @Override
     public ApiResponse<EvaluationCriteriaResponse> updateCriteria(Long id, EvaluationCriteriaUpdateRequest request) throws ResourceNotFoundException, ResourceConflictException {
-        Map<String, String> errors = new HashMap<>();
+        Map<String, String> errors = ValidationErrorUtil.createErrorMap();
         EvaluationCriteria existingCriteria = evaluationCriteriaRepository.findByCriterionIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Evaluation criteria not found with id: " + id));
 
         if (evaluationCriteriaRepository.existsByCriterionNameIgnoreCaseAndIsDeletedFalseAndCriterionIdNot(request.getCriterionName(), id)) {
             errors.put("criterionName", "Evaluation criteria name already exists");
-        }
-        if (!errors.isEmpty()) {
-            throw new ResourceConflictException("Validation failed", errors);
+            throw new ResourceConflictException("CONFLICT", errors);
         }
 
         EvaluationCriteriaMapper.updateFromDto(existingCriteria, request);

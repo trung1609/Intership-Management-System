@@ -6,6 +6,7 @@ import com.trung.dto.request.FormLoginRequest;
 import com.trung.dto.request.FormRegisterRequest;
 import com.trung.dto.response.*;
 import com.trung.exception.InvalidCredentialsException;
+import com.trung.exception.ResourceBadRequestException;
 import com.trung.exception.ResourceConflictException;
 import com.trung.exception.ResourceNotFoundException;
 import com.trung.mapper.UserMapper;
@@ -13,6 +14,7 @@ import com.trung.repository.IUserRepository;
 import com.trung.security.jwt.JwtProvider;
 import com.trung.security.principal.UserPrincipal;
 import com.trung.service.IAuthService;
+import com.trung.util.ValidationErrorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -37,19 +40,25 @@ public class AuthServiceImpl implements IAuthService {
     private long expire;
 
     @Override
-    public ApiResponse<RegisterResponse> register(FormRegisterRequest request) throws ResourceConflictException {
-
+    public ApiResponse<RegisterResponse> register(FormRegisterRequest request) throws ResourceBadRequestException {
+        Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         User users = new User();
+
+        if (request.getRole() != null) {
+            try {
+                users.setRole(Role.valueOf(request.getRole().toUpperCase()));
+            }catch (IllegalArgumentException e) {
+                errorList.put("role", "Invalid role value");
+                throw new ResourceBadRequestException("Validation failed", errorList);
+            }
+        }
+
         users.setUsername(request.getUsername());
         users.setPassword(passwordEncoder.encode(request.getPassword()));
         users.setFullName(request.getFullName());
         users.setEmail(request.getEmail());
         users.setPhoneNumber(request.getPhoneNumber());
-        if (request.getRole() != null) {
-            users.setRole(Role.valueOf(request.getRole()));
-        } else {
-            users.setRole(Role.ROLE_STUDENT);
-        }
+
 
         userRepository.save(users);
 

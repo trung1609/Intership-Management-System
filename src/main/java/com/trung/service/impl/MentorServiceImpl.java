@@ -17,6 +17,7 @@ import com.trung.mapper.MentorMapper;
 import com.trung.repository.IMentorRepository;
 import com.trung.repository.IUserRepository;
 import com.trung.service.IMentorService;
+import com.trung.util.CurrentUserUtil;
 import com.trung.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,14 +35,11 @@ import java.util.Map;
 public class MentorServiceImpl implements IMentorService {
     private final IMentorRepository mentorRepository;
     private final IUserRepository iUserRepository;
+    private final CurrentUserUtil currentUserUtil;
 
     @Override
     public PageResponseDTO<Object> getAllMentor(PageRequestDTO pageRequestDTO) throws ResourceNotFoundException, ResourceForbiddenException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        User user = iUserRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+        User user = currentUserUtil.getCurrentUser();
 
         Page<Mentor> mentorPage;
         if (user.getRole() == Role.ROLE_ADMIN) {
@@ -65,11 +63,7 @@ public class MentorServiceImpl implements IMentorService {
 
     @Override
     public ApiResponse<Object> getMentorById(Long id) throws ResourceNotFoundException, ResourceForbiddenException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        User user = iUserRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+        User user = currentUserUtil.getCurrentUser();
 
         if (user.getRole() == Role.ROLE_ADMIN) {
             Mentor mentor = mentorRepository.findById(id)
@@ -131,10 +125,7 @@ public class MentorServiceImpl implements IMentorService {
     @Override
     public ApiResponse<MentorResponse> updateMentor(Long id, MentorUpdateRequest request) throws ResourceNotFoundException, ResourceForbiddenException, ResourceBadRequestException, ResourceConflictException {
         Map<String, String> errorList = new HashMap<>();
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User currentUser = iUserRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+        User currentUser = currentUserUtil.getCurrentUser();
 
         if (currentUser.getRole() == Role.ROLE_ADMIN){
             Mentor existingMentor = mentorRepository.findById(id)
@@ -184,4 +175,6 @@ public class MentorServiceImpl implements IMentorService {
             throw new ResourceForbiddenException("User role not supported for this operation");
         }
     }
+
+
 }

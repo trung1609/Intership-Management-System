@@ -16,6 +16,7 @@ import com.trung.exception.ResourceNotFoundException;
 import com.trung.mapper.InternshipAssignmentMapper;
 import com.trung.repository.*;
 import com.trung.service.InternshipAssignmentService;
+import com.trung.util.CurrentUserUtil;
 import com.trung.util.PaginationUtil;
 import com.trung.util.ValidationErrorUtil;
 import jakarta.transaction.Transactional;
@@ -37,7 +38,7 @@ public class InternshipAssignmentServiceImpl implements InternshipAssignmentServ
     private final IMentorRepository iMentorRepository;
     private final IStudentRepository iStudentRepository;
     private final IUserRepository iUserRepository;
-
+    private final CurrentUserUtil currentUserUtil;
 
     @Override
     @Transactional
@@ -90,11 +91,7 @@ public class InternshipAssignmentServiceImpl implements InternshipAssignmentServ
 
     @Override
     public PageResponseDTO<InternshipAssignmentResponse> getAllInternshipAssignment(String search, PageRequestDTO pageRequestDTO) throws ResourceNotFoundException, ResourceForbiddenException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        User user = iUserRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+        User user = currentUserUtil.getCurrentUser();
 
         Pageable pageable = PaginationUtil.createPageRequest(pageRequestDTO);
 
@@ -115,11 +112,7 @@ public class InternshipAssignmentServiceImpl implements InternshipAssignmentServ
 
     @Override
     public ApiResponse<InternshipAssignmentResponse> getInternshipAssignmentById(Long internshipAssignmentId) throws ResourceNotFoundException, ResourceForbiddenException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        User user = iUserRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+        User user = currentUserUtil.getCurrentUser();
 
         if (user.getRole() == Role.ROLE_ADMIN) {
             InternshipAssignment internshipAssignment = internshipAssignmentRepository.findById(internshipAssignmentId)
@@ -159,18 +152,14 @@ public class InternshipAssignmentServiceImpl implements InternshipAssignmentServ
         InternshipAssignment internshipAssignment = internshipAssignmentRepository.findById(internshipAssignmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Internship assignment not found with id: " + internshipAssignmentId));
 
-        AssignmentStatus assignmentStatus = null;
         if (request.getStatus() != null) {
             try {
-                assignmentStatus = AssignmentStatus.valueOf(request.getStatus().toUpperCase());
+                internshipAssignment.setStatus(AssignmentStatus.valueOf(request.getStatus().toUpperCase()));
             } catch (IllegalArgumentException e) {
                 ValidationErrorUtil.addError(errorList, "status", "Invalid status value");
                 throw new ResourceBadRequestException("Validation failed", errorList);
             }
         }
-
-        internshipAssignment.setStatus(assignmentStatus);
-
         internshipAssignmentRepository.save(internshipAssignment);
         return new ApiResponse<>(
                 InternshipAssignmentMapper.toDto(internshipAssignment),

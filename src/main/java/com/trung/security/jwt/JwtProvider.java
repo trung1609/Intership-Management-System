@@ -51,15 +51,15 @@ public class JwtProvider {
                     .parseClaimsJws(token);
             return true;
         }catch (ExpiredJwtException e) {
-            request.setAttribute("exception", "ExpiredJwtException");
+            request.setAttribute("error", "ExpiredJwtException");
         }catch (UnsupportedJwtException e) {
-            request.setAttribute("exception", "UnsupportedJwtException");
+            request.setAttribute("error", "UnsupportedJwtException");
         }catch (IllegalArgumentException e) {
-            request.setAttribute("exception", "IllegalArgumentException");
+            request.setAttribute("error", "IllegalArgumentException");
         }catch (SignatureException e) {
-            request.setAttribute("exception", "SignatureException");
+            request.setAttribute("error", "SignatureException");
         }catch (MalformedJwtException e) {
-            request.setAttribute("exception", "MalformedJwtException");
+            request.setAttribute("error", "MalformedJwtException");
         }
         return false;
     }

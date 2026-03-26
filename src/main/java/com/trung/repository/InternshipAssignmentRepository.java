@@ -1,5 +1,6 @@
 package com.trung.repository;
 
+import com.trung.domain.entity.AssessmentResult;
 import com.trung.domain.entity.InternshipAssignment;
 import com.trung.domain.entity.Student;
 import com.trung.domain.enums.AssignmentStatus;
@@ -20,6 +21,8 @@ public interface InternshipAssignmentRepository extends JpaRepository<Internship
     Page<Student> findStudentsByMentorId(@Param("mentorId") Long mentorId, Pageable pageable);
 
     boolean existsByStudent_StudentIdAndPhase_PhaseId(Long studentId, Long phaseId);
+
+    boolean existsByMentor_MentorIdAndAssignmentId(Long mentorId, Long assignmentId);
 
     @Query("select ia from InternshipAssignment ia where ia.mentor.mentorId = :mentorId and ( " +
             ":search is null or :search = '' or " +
@@ -50,9 +53,10 @@ public interface InternshipAssignmentRepository extends JpaRepository<Internship
             "lower(ia.student.user.fullName) like lower(concat('%', :search, '%'))")
     Page<InternshipAssignment> findAllByKeyword(@Param("search") String search, Pageable pageable);
 
+
     Optional<InternshipAssignment> findByAssignmentIdAndMentor_MentorId(Long assignmentId, Long mentorId);
 
     Optional<InternshipAssignment> findByAssignmentIdAndStudent_StudentId(Long assignmentId, Long studentId);
 
-
+    boolean existsByStudent_StudentIdAndAssignmentId(Long studentId, Long assignmentId);
 }

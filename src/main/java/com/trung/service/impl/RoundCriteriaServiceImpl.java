@@ -21,6 +21,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class RoundCriteriaServiceImpl implements IRoundCriteriaService {
@@ -52,9 +54,11 @@ public class RoundCriteriaServiceImpl implements IRoundCriteriaService {
     @Override
     public ApiResponse<RoundCriterionResponse> createCriterionInRound(RoundCriterionCreateRequest request) throws ResourceNotFoundException {
 
+        // kiem tra assessmentRound co ton tai hay khong
         AssessmentRound assessmentRound = iAssessmentRoundsRepository.findByRoundIdAndIsDeletedFalse(request.getRoundId())
                 .orElseThrow(() -> new ResourceNotFoundException("AssessmentRound not found with id: " + request.getRoundId()));
 
+        // kiem tra criteria co ton tai hay khong
         EvaluationCriteria evaluationCriteria = iEvaluationCriteriaRepository.findByCriterionIdAndIsDeletedFalse(request.getCriterionId())
                 .orElseThrow(() -> new ResourceNotFoundException("EvaluationCriteria not found with id: " + request.getCriterionId()));
 
@@ -73,7 +77,7 @@ public class RoundCriteriaServiceImpl implements IRoundCriteriaService {
                 true,
                 "SUCCESS",
                 null,
-                null);
+                LocalDateTime.now());
     }
 
     @Override
@@ -90,7 +94,7 @@ public class RoundCriteriaServiceImpl implements IRoundCriteriaService {
                 true,
                 "SUCCESS",
                 null,
-                null);
+                LocalDateTime.now());
     }
 
     @Override
@@ -104,6 +108,6 @@ public class RoundCriteriaServiceImpl implements IRoundCriteriaService {
                 true,
                 "SUCCESS",
                 null,
-                null);
+                LocalDateTime.now());
     }
 }

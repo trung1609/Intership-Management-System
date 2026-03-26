@@ -63,14 +63,14 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public ApiResponse<UserResponse> getProfileById(Long id) throws ResourceConflictException, ResourceNotFoundException {
+    public ApiResponse<UserResponse> getProfileById(Long id) throws ResourceNotFoundException {
         User users = userRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         return new ApiResponse<>(UserMapper.toDto(users), true, "SUCCESS", null, null);
     }
 
     @Override
-    public ApiResponse<UserResponse> createProfile(UserCreateRequest userCreateRequest) throws ResourceConflictException, ResourceBadRequestException {
+    public ApiResponse<UserResponse> createProfile(UserCreateRequest userCreateRequest) throws ResourceBadRequestException {
         Role roleEnum = null;
         Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         
@@ -79,11 +79,8 @@ public class UserServiceImpl implements IUserService {
                 roleEnum = Role.valueOf(userCreateRequest.getRole().toUpperCase());
             } catch (IllegalArgumentException e) {
                 ValidationErrorUtil.addError(errorList, "role", "Invalid role value");
+                throw new ResourceBadRequestException("BAD_REQUEST", errorList);
             }
-        }
-
-        if (ValidationErrorUtil.hasErrors(errorList)) {
-            throw new ResourceBadRequestException("BAD_REQUEST", errorList);
         }
 
         User users = new User();
@@ -105,7 +102,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public ApiResponse<UserResponse> updateProfile(Long id, UserUpdateRequest userUpdateRequest) throws ResourceConflictException, ResourceNotFoundException {
-        Map<String, String> errorList = new HashMap<>();
+        Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         User existingUser = userRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         if (userRepository.existsByUsernameAndUserIdNot(userUpdateRequest.getUsername(), id)) {
@@ -115,7 +112,7 @@ public class UserServiceImpl implements IUserService {
         if (userRepository.existsByEmailAndIsDeletedFalseAndIsActiveTrueAndUserIdNot(userUpdateRequest.getEmail(), id)) {
             errorList.put("email", "Email already exists");
         }
-        if (!errorList.isEmpty()) {
+        if (ValidationErrorUtil.hasErrors(errorList)) {
             throw new ResourceConflictException("CONFLICT", errorList);
         }
         UserMapper.updateFromDto(existingUser, userUpdateRequest);
@@ -135,27 +132,21 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public ApiResponse<UserResponse> updateRole(Long id, UpdateRoleRequest request) throws ResourceConflictException, ResourceNotFoundException, ResourceForbiddenException, ResourceBadRequestException {
-        Map<String, String> errorList = new HashMap<>();
+        Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         User users = userRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-
-        Role roleEnum = null;
-        if (request.getRole() != null && !request.getRole().isBlank()) {
-            try {
-                roleEnum = Role.valueOf(request.getRole().toUpperCase());
-            } catch (IllegalArgumentException e) {
-                errorList.put("role", "Invalid role value");
-            }
-        }
-        if (!errorList.isEmpty()) {
-            throw new ResourceBadRequestException("BAD_REQUEST", errorList);
-        }
 
         if (users.getRole() == Role.ROLE_ADMIN) {
             throw new ResourceForbiddenException("Cannot change role of an admin user");
         }
-
-        users.setRole(Role.valueOf(request.getRole().toUpperCase()));
+        if (request.getRole() != null && !request.getRole().isBlank()) {
+            try {
+                users.setRole(Role.valueOf(request.getRole().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                errorList.put("role", "Invalid role value");
+                throw new ResourceBadRequestException("BAD_REQUEST", errorList);
+            }
+        }
         userRepository.save(users);
         return new ApiResponse<>(UserMapper.toDto(users), true, "SUCCESS", null, LocalDateTime.now());
     }

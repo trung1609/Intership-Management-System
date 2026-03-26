@@ -26,20 +26,20 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
 
-        String exception = (String) request.getAttribute("exception");
+        String error = (String) request.getAttribute("error");
 
-        if (exception == null) {
-            exception = "InvalidTokenException";
+        if (error == null) {
+            error = authException.getClass().getSimpleName();
         }
 
-        JwtErrorResponse errorResponse = buildErrorResponse(exception);
+        JwtErrorResponse errorResponse = buildErrorResponse(error);
         response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
         response.getWriter().flush();
         response.getWriter().close();
     }
 
-    private JwtErrorResponse buildErrorResponse(String exception) {
-        return switch (exception) {
+    private JwtErrorResponse buildErrorResponse(String error) {
+        return switch (error) {
             case EXPIRED -> new JwtErrorResponse("Unauthorized", "Token has expired");
             case MALFORMED -> new JwtErrorResponse("Unauthorized", "Token is malformed");
             case SIGNATURE -> new JwtErrorResponse("Unauthorized", "Invalid token signature");

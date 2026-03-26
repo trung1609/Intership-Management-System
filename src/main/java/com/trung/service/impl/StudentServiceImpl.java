@@ -15,6 +15,7 @@ import com.trung.repository.IStudentRepository;
 import com.trung.repository.IUserRepository;
 import com.trung.repository.InternshipAssignmentRepository;
 import com.trung.service.IStudentService;
+import com.trung.util.CurrentUserUtil;
 import com.trung.util.PaginationUtil;
 import com.trung.util.ValidationErrorUtil;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +36,10 @@ public class StudentServiceImpl implements IStudentService {
     private final IStudentRepository studentRepository;
     private final IUserRepository iUserRepository;
     private final InternshipAssignmentRepository internshipAssignmentRepository;
+    private final CurrentUserUtil currentUserUtil;
 
     @Override
-    public ApiResponse<StudentResponse> createStudent(StudentCreateRequest request) throws ResourceConflictException, ResourceNotFoundException, ResourceBadRequestException, InvalidDateFormatException {
+    public ApiResponse<StudentResponse> createStudent(StudentCreateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, InvalidDateFormatException {
         Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         User user = iUserRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(request.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + request.getUserId()));
@@ -71,11 +73,7 @@ public class StudentServiceImpl implements IStudentService {
     @Override
     public PageResponseDTO<StudentResponse> getAllStudent(PageRequestDTO pageRequestDTO) throws ResourceNotFoundException, ResourceForbiddenException {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // lấy username của người dùng hiện tại
-
-        User currentUser = iUserRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+        User currentUser = currentUserUtil.getCurrentUser();
 
         Page<Student> studentPage;
 
@@ -96,11 +94,7 @@ public class StudentServiceImpl implements IStudentService {
 
     @Override
     public ApiResponse<StudentResponse> getStudentById(Long id) throws ResourceNotFoundException, ResourceForbiddenException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // lấy username của người dùng hiện tại
-
-        User user = iUserRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+        User user = currentUserUtil.getCurrentUser();
 
         if (user.getRole() == Role.ROLE_ADMIN || user.getRole() == Role.ROLE_MENTOR) {
             Student student = studentRepository.findById(id)
@@ -121,11 +115,7 @@ public class StudentServiceImpl implements IStudentService {
     @Override
     public ApiResponse<StudentResponse> updateStudent(Long id, StudentUpdateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, ResourceForbiddenException, ResourceConflictException, InvalidDateFormatException {
         Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        User currentUser = iUserRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+        User currentUser = currentUserUtil.getCurrentUser();
 
         if (currentUser.getRole() == Role.ROLE_ADMIN){
             Student existingStudent = studentRepository.findById(id)

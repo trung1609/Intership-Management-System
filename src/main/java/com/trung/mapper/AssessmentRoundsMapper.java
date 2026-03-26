@@ -83,12 +83,13 @@ public class AssessmentRoundsMapper {
             for (RoundCriterionUpdateRequest req : request.getCriteria()) {
                 if (!uniqueCriterionIds.add(req.getCriterionId())) {
                     ValidationErrorUtil.addError(errorList, "roundCriteria", "Duplicate criterion ID");
-                }
-                if (ValidationErrorUtil.hasErrors(errorList)) {
                     throw new ResourceConflictException("Validation failed", errorList);
                 }
-                RoundCriteria roundCriteria = assessmentRound.getRoundCriteriaList().stream()
-                        .filter(rc -> rc.getCriterion().getCriterionId().equals(req.getCriterionId()))
+                RoundCriteria roundCriteria = assessmentRound.getRoundCriteriaList()
+                        .stream()
+                        .filter(rc -> rc
+                                .getCriterion()
+                                .getCriterionId().equals(req.getCriterionId()))
                         .findFirst()
                         .orElseThrow(() -> new ResourceNotFoundException("Round criteria not found with id: " + req.getCriterionId()));
                 roundCriteria.setWeight(req.getWeight());

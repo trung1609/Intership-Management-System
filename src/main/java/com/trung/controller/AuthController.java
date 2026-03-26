@@ -7,6 +7,7 @@ import com.trung.dto.response.JwtResponse;
 import com.trung.dto.response.RegisterResponse;
 import com.trung.dto.response.UserResponse;
 import com.trung.exception.InvalidCredentialsException;
+import com.trung.exception.ResourceBadRequestException;
 import com.trung.exception.ResourceConflictException;
 import com.trung.exception.ResourceNotFoundException;
 import com.trung.service.IAuthService;
@@ -27,7 +28,7 @@ public class AuthController {
     private final IAuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<RegisterResponse>> register(@Valid @RequestBody FormRegisterRequest request) throws ResourceConflictException {
+    public ResponseEntity<ApiResponse<RegisterResponse>> register(@Valid @RequestBody FormRegisterRequest request) throws ResourceConflictException, ResourceBadRequestException {
         ApiResponse<RegisterResponse> response = authService.register(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

@@ -39,11 +39,13 @@ public class RoundCriteriaController {
     }
 
     @PutMapping("/{roundCriteriaId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<RoundCriterionResponse>> updateWeight(@PathVariable Long roundCriteriaId, @Valid @RequestBody RoundCriterionUpdateRequest request) throws ResourceNotFoundException {
         return new ResponseEntity<>(roundCriteriaService.updateWeight(roundCriteriaId, request), HttpStatus.OK);
     }
 
     @DeleteMapping("/{roundCriteriaId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> deleteCriterionInRound(@PathVariable Long roundCriteriaId) throws ResourceNotFoundException {
         return new ResponseEntity<>(roundCriteriaService.deleteCriterionInRound(roundCriteriaId), HttpStatus.OK);
     }
