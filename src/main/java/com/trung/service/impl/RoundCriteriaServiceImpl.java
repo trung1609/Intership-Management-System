@@ -9,6 +9,7 @@ import com.trung.dto.request.RoundCriterionUpdateRequest;
 import com.trung.dto.response.ApiResponse;
 import com.trung.dto.response.PageResponseDTO;
 import com.trung.dto.response.RoundCriterionResponse;
+import com.trung.exception.ResourceConflictException;
 import com.trung.exception.ResourceNotFoundException;
 import com.trung.mapper.RoundCriteriaMapper;
 import com.trung.repository.IAssessmentRoundsRepository;
@@ -16,12 +17,14 @@ import com.trung.repository.IEvaluationCriteriaRepository;
 import com.trung.repository.IRoundCriteriaRepository;
 import com.trung.service.IRoundCriteriaService;
 import com.trung.util.PaginationUtil;
+import com.trung.util.ValidationErrorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -52,8 +55,8 @@ public class RoundCriteriaServiceImpl implements IRoundCriteriaService {
     }
 
     @Override
-    public ApiResponse<RoundCriterionResponse> createCriterionInRound(RoundCriterionCreateRequest request) throws ResourceNotFoundException {
-
+    public ApiResponse<RoundCriterionResponse> createCriterionInRound(RoundCriterionCreateRequest request) throws ResourceNotFoundException, ResourceConflictException {
+        Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         // kiem tra assessmentRound co ton tai hay khong
         AssessmentRound assessmentRound = iAssessmentRoundsRepository.findByRoundIdAndIsDeletedFalse(request.getRoundId())
                 .orElseThrow(() -> new ResourceNotFoundException("AssessmentRound not found with id: " + request.getRoundId()));
@@ -63,7 +66,8 @@ public class RoundCriteriaServiceImpl implements IRoundCriteriaService {
                 .orElseThrow(() -> new ResourceNotFoundException("EvaluationCriteria not found with id: " + request.getCriterionId()));
 
         if (roundCriteriaRepository.existsByCriterionAndRound(request.getRoundId(), request.getCriterionId())) {
-            throw new ResourceNotFoundException("RoundCriteria already exists with criterion id: " + request.getCriterionId() + " and round id: " + request.getRoundId());
+            errorList.put("criterionId", "RoundCriteria already exists for criterion id: " + request.getCriterionId());
+            throw new ResourceConflictException("Validation failed", errorList);
         }
 
         RoundCriteria roundCriteria = RoundCriteria.builder()

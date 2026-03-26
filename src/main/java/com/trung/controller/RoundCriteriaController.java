@@ -6,6 +6,7 @@ import com.trung.dto.request.RoundCriterionUpdateRequest;
 import com.trung.dto.response.ApiResponse;
 import com.trung.dto.response.PageResponseDTO;
 import com.trung.dto.response.RoundCriterionResponse;
+import com.trung.exception.ResourceConflictException;
 import com.trung.exception.ResourceNotFoundException;
 import com.trung.service.IRoundCriteriaService;
 import jakarta.validation.Valid;
@@ -34,7 +35,7 @@ public class RoundCriteriaController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<RoundCriterionResponse>> createCriterionInRound(@Valid @RequestBody RoundCriterionCreateRequest request) throws ResourceNotFoundException {
+    public ResponseEntity<ApiResponse<RoundCriterionResponse>> createCriterionInRound(@Valid @RequestBody RoundCriterionCreateRequest request) throws ResourceNotFoundException, ResourceConflictException {
         return new ResponseEntity<>(roundCriteriaService.createCriterionInRound(request), HttpStatus.CREATED);
     }
 

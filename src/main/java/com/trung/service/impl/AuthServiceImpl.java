@@ -17,6 +17,7 @@ import com.trung.service.IAuthService;
 import com.trung.util.ValidationErrorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -87,6 +88,11 @@ public class AuthServiceImpl implements IAuthService {
                     .expiresIn(expireDate)
                     .username(request.getUsername())
                     .user(UserMapper.toDto(users))
+                    .build();
+
+            ResponseCookie cookie = ResponseCookie.from("accessToken", token)
+                    .httpOnly(true)
+                    .secure(true)
                     .build();
             return new ApiResponse<>(response, true, "SUCCESS", null, LocalDateTime.now());
         }catch (AuthenticationException ex) {

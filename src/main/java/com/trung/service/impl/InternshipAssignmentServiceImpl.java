@@ -168,8 +168,4 @@ public class InternshipAssignmentServiceImpl implements InternshipAssignmentServ
                 LocalDateTime.now());
     }
 
-    @Override
-    public ApiResponse<String> deleteInternshipAssignment(Long id) {
-        return null;
-    }
 }

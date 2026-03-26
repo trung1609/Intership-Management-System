@@ -24,7 +24,7 @@ public class JwtProvider {
     private long expire;
 
     private Key key(){
-        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));// chuyen doi chuoi thanh key
     }
 
     // generate token
