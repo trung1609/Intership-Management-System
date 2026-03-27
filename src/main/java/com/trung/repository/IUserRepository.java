@@ -16,7 +16,7 @@ public interface IUserRepository extends JpaRepository<User, Long> {
 
     @Query("select case when count(u) > 0 then true else false end " +
             "from User u " +
-            "where lower( replace(u.username, ' ', '')) = lower( replace(:username, ' ', '')) " +
+            "where lower(u.username) = lower(:username) " +
             "and u.isDeleted = false " +
             "and u.isActive = true")
     boolean existsByUsername(String username);

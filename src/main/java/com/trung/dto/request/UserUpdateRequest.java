@@ -12,6 +12,8 @@ import lombok.*;
 public class UserUpdateRequest {
 
     private String username;
+
+    @Pattern(regexp = "^[\\p{L}0-9]+(\\s[\\p{L}0-9]+)*$", message = "Full name must contain only letters and numbers, and cannot have leading or trailing spaces")
     private String fullName;
 
     @Email(message = "Email is not valid")

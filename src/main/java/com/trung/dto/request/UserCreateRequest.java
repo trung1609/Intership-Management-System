@@ -23,6 +23,7 @@ public class UserCreateRequest {
     private String password;
 
     @NotBlank(message = "Full name is required")
+    @Pattern(regexp = "^[\\p{L}0-9]+(\\s[\\p{L}0-9]+)*$", message = "Full name must contain only letters and numbers, and cannot have leading or trailing spaces")
     private String fullName;
 
     @NotBlank(message = "Email is required")

@@ -31,7 +31,7 @@ public class StudentCreateRequest {
     @NotBlank(message = "Class room is required")
     public String classRoom;
 
-    @NotNull(message = "Date of birth is required")
+    @NotBlank(message = "Date of birth is required")
     public String dateOfBirth;
 
     @NotBlank(message = "Address is required")
