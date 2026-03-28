@@ -13,6 +13,7 @@ import com.trung.mapper.UserMapper;
 import com.trung.repository.IUserRepository;
 import com.trung.security.jwt.JwtAuthenticationFilter;
 import com.trung.security.jwt.JwtProvider;
+import com.trung.security.jwt.RefreshTokenService;
 import com.trung.security.jwt.TokenBlacklistService;
 import com.trung.security.principal.UserPrincipal;
 import com.trung.service.IAuthService;
@@ -39,6 +40,7 @@ public class AuthServiceImpl implements IAuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final TokenBlacklistService tokenBlacklistService;
+    private final RefreshTokenService refreshTokenService;
 
     @Value("${jwt_expire}")
     private long expire;
@@ -85,9 +87,15 @@ public class AuthServiceImpl implements IAuthService {
 
             Date expireDate = new Date(new Date().getTime() + expire);
 
-            String token = jwtProvider.generateToken(users);
+            String accessToken = jwtProvider.generateAccessToken(users);
+
+            String refreshToken = jwtProvider.generateRefreshToken(users);
+
+            refreshTokenService.saveRefreshToken(refreshToken);
+
             JwtResponse response = JwtResponse.builder()
-                    .token(token)
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
                     .expiresIn(expireDate)
                     .username(request.getUsername())
                     .user(UserMapper.toDto(users))
@@ -106,13 +114,53 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
-    public ApiResponse<String> logout(String token) {
-        if (token != null && !token.isEmpty()) {
-            // Thêm token vào blacklist Redis
-            tokenBlacklistService.addToBlacklist(token);
-        }
+    public ApiResponse<String> logout(String accessToken, String refreshToken) {
+        // Thêm cả hai token vào blacklist
+        tokenBlacklistService.addToBlacklist(accessToken, refreshToken);
+
         return new ApiResponse<>(
                 "Logout successfully",
+                true,
+                "SUCCESS",
+                null,
+                LocalDateTime.now()
+        );
+    }
+
+    @Override
+    public ApiResponse<RefreshTokenResponse> refreshToken(String refreshToken) throws InvalidCredentialsException, ResourceNotFoundException {
+        if (!refreshTokenService.isRefreshTokenValid(refreshToken)) {
+            throw new InvalidCredentialsException("Invalid refresh token or expired");
+        }
+
+        if (tokenBlacklistService.isTokenBlacklisted(refreshToken)) {
+            throw new InvalidCredentialsException("Refresh token has been blacklisted");
+        }
+
+//        if (oldAccessToken != null) {
+//            tokenBlacklistService.addTokenToBlacklist(oldAccessToken, "access");
+//        }
+
+        tokenBlacklistService.addTokenToBlacklist(refreshToken, "refresh");
+
+        String username = jwtProvider.getUsernameFromToken(refreshToken);
+        User users = userRepository.findByUsernameAndIsDeletedFalseAndIsActiveTrue(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+
+
+        String accessTokenNew = jwtProvider.generateAccessToken(users);
+
+        String refreshTokenNew = jwtProvider.generateRefreshToken(users);
+        refreshTokenService.saveRefreshToken(refreshTokenNew);
+
+        RefreshTokenResponse response = RefreshTokenResponse.builder()
+                .accessToken(accessTokenNew)
+                .refreshToken(refreshTokenNew)
+                .expiresIn(new Date(new Date().getTime() + expire))
+                .build();
+
+        return new ApiResponse<>(
+                response,
                 true,
                 "SUCCESS",
                 null,

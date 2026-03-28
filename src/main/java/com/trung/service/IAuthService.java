@@ -14,5 +14,6 @@ public interface IAuthService {
     ApiResponse<RegisterResponse> register(FormRegisterRequest request) throws ResourceConflictException, ResourceBadRequestException;
     ApiResponse<JwtResponse> login(FormLoginRequest request) throws AuthenticationException, InvalidCredentialsException, ResourceConflictException;
     ApiResponse<UserResponse> getMyProfile(String username) throws ResourceNotFoundException;
-    ApiResponse<String> logout(String token);
+    ApiResponse<String> logout(String accessToken, String refreshToken);
+    ApiResponse<RefreshTokenResponse> refreshToken(String refreshToken) throws InvalidCredentialsException, ResourceNotFoundException;
 }

@@ -199,9 +199,11 @@ gradle test
 ## 📚 API Endpoints
 
 ### Authentication
-- `POST /api/auth/register` - Đăng ký tài khoản
-- `POST /api/auth/login` - Đăng nhập
-- `POST /api/auth/logout` - Đăng xuất
+- `POST /api/v1/auth/register` - Đăng ký tài khoản
+- `POST /api/v1/auth/login` - Đăng nhập (trả về accessToken, set refreshToken vào HttpOnly cookie)
+- `POST /api/v1/auth/logout` - Đăng xuất (blacklist cả accessToken & refreshToken, xóa cookie)
+- `POST /api/v1/auth/refresh` - Refresh access token bằng refreshToken từ cookie
+- `GET /api/v1/auth/me` - Lấy thông tin cá nhân người dùng
 
 ### User Management
 - `GET /api/users` - Lấy danh sách người dùng
@@ -244,13 +246,48 @@ gradle test
 - **ROLE_MENTOR** - Cố vấn/Hướng dẫn viên
 - **ROLE_STUDENT** - Sinh viên thực tập
 
-### JWT Token
-Mỗi request cần gửi JWT token trong header:
+### JWT Token Strategy
+- **Access Token**: Lưu trong response body, dùng trong Authorization header
+  - Thời hạn: 1 giờ (hoặc tuỳ cấu hình)
+  - Format: `Authorization: Bearer <accessToken>`
+  - Gửi qua mỗi request API
+
+- **Refresh Token**: Lưu trong HttpOnly cookie (an toàn hơn)
+  - Thời hạn: 7 ngày (hoặc tuỳ cấu hình)
+  - Tự động gửi kèm mỗi request
+  - Không thể access qua JavaScript (XSS protection)
+  - Flags: `httpOnly=true`, `secure=true`, `sameSite=Strict`
+
+### Token Lifecycle
+
 ```
-Authorization: Bearer <token>
+1. LOGIN
+   ├─ POST /api/v1/auth/login
+   └─ Response:
+      ├─ accessToken (JSON body)
+      └─ refreshToken (HttpOnly cookie)
+
+2. AUTHENTICATED REQUESTS
+   ├─ Authorization: Bearer <accessToken>
+   └─ Cookie: refreshToken=... (tự động)
+
+3. ACCESS TOKEN EXPIRES
+   ├─ POST /api/v1/auth/refresh
+   └─ Response:
+      ├─ New accessToken (JSON body)
+      └─ New refreshToken (HttpOnly cookie)
+
+4. LOGOUT
+   ├─ POST /api/v1/auth/logout
+   ├─ Blacklist cả accessToken & refreshToken trong Redis
+   └─ Clear refreshToken cookie (maxAge=0)
 ```
 
-Token được cấp khi đăng nhập thành công và có hiệu lực 24 giờ.
+### Token Blacklist (Redis)
+- Cả accessToken và refreshToken bị blacklist khi logout
+- TTL tự động = thời gian còn lại của token
+- Token không thể tái sử dụng ngay lập tức
+- Redis tự động cleanup khi TTL hết
 
 ## 📝 Validation
 

@@ -25,44 +25,52 @@ public class TokenBlacklistService {
     private static final String BLACKLIST_PREFIX = "blacklist-token:";
 
 
-    public void addToBlacklist(String token) {
+    public void addToBlacklist(String accessToken, String refreshToken) {
         try {
-            // Lấy expiration time từ token
+            // Add access token
+            if (accessToken != null && !accessToken.isBlank()) {
+                addTokenToBlacklist(accessToken, "access");
+            }
+            
+            // Add refresh token
+            if (refreshToken != null && !refreshToken.isBlank()) {
+                addTokenToBlacklist(refreshToken, "refresh");
+            }
+        } catch (Exception e) {
+            log.error("Error adding tokens to blacklist: {}", e.getMessage());
+        }
+    }
+
+    public void addTokenToBlacklist(String token, String tokenType) {
+        try {
             long expirationTime = getExpireFromToken(token);
-            long timeToLive = (expirationTime - System.currentTimeMillis()) / 1000; // Chuyen sang giay
+            long currentTime = System.currentTimeMillis();
+            long timeToLive = (expirationTime - currentTime) / 1000; // Convert to seconds
 
             if (timeToLive > 0) {
-                String blacklistKey = BLACKLIST_PREFIX + token;
-                // Lưu token vào Redis với TTL value
-                String ttlValue = "ttl=" + timeToLive;
+                String blacklistKey = BLACKLIST_PREFIX + tokenType + ":" + token;
+                String ttlValue = "ttl=" + timeToLive + "|type=" + tokenType;
                 redisTemplate.opsForValue().set(blacklistKey, ttlValue, timeToLive, TimeUnit.SECONDS);
             }
         } catch (Exception e) {
-            log.error("Error adding token to blacklist: {}", e.getMessage());
+            log.error("Error adding {} token to blacklist: {}", tokenType, e.getMessage());
         }
     }
 
     public boolean isTokenBlacklisted(String token) {
         try {
-            String blacklistKey = BLACKLIST_PREFIX + token;
-            Boolean exists = redisTemplate.hasKey(blacklistKey);
-            return exists != null && exists;
+            String accessKey = BLACKLIST_PREFIX + "access:" + token;
+            String refreshKey = BLACKLIST_PREFIX + "refresh:" + token;
+            
+            Boolean accessExists = redisTemplate.hasKey(accessKey);
+            Boolean refreshExists = redisTemplate.hasKey(refreshKey);
+            
+            return (accessExists != null && accessExists) || (refreshExists != null && refreshExists);
         } catch (Exception e) {
             log.error("Error checking token blacklist: {}", e.getMessage());
             return false;
         }
     }
-
-    public void removeFromBlacklist(String token) {
-        try {
-            String blacklistKey = BLACKLIST_PREFIX + token;
-            redisTemplate.delete(blacklistKey);
-            log.info("Token removed from blacklist");
-        } catch (Exception e) {
-            log.error("Error removing token from blacklist: {}", e.getMessage());
-        }
-    }
-    
 
     private long getExpireFromToken(String token) {
         return Jwts.parser()

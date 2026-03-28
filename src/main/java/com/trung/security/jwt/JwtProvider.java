@@ -31,8 +31,8 @@ public class JwtProvider {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));// chuyen doi chuoi thanh key
     }
 
-    // generate token
-    public String generateToken(User users){
+    // generate access token
+    public String generateAccessToken(User users){
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + expire);
         Map<String, Object> claims = new HashMap<>();
@@ -40,6 +40,22 @@ public class JwtProvider {
         claims.put("email", users.getEmail());
         return Jwts.builder()
                 .setSubject(users.getUsername())
+                .setIssuedAt(now)
+                .setExpiration(expireDate)
+                .addClaims(claims)
+                .signWith(key(), SignatureAlgorithm.HS512)
+                .compact();
+    }
+
+    // generate refresh token
+    public String generateRefreshToken(User user){
+        Date now = new Date();
+        Date expireDate = new Date(now.getTime() + expire * 7);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", user.getRole().name());
+        claims.put("email", user.getEmail());
+        return Jwts.builder()
+                .setSubject(user.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expireDate)
                 .addClaims(claims)

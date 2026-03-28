@@ -1,18 +1,16 @@
 package com.trung.dto.response;
+
 import lombok.*;
 
 import java.util.Date;
 
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Getter
-@Setter
-public class JwtResponse {
-    private String accessToken;
+public class RefreshTokenResponse {
     private String refreshToken;
-    private final String type = "Bearer";
-    private String username;
+    private String accessToken;
     private Date expiresIn;
-    private UserResponse user;
 }
