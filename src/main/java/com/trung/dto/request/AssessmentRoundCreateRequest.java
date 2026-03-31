@@ -32,5 +32,5 @@ public class AssessmentRoundCreateRequest {
 
     @NotNull(message = "Evaluation criteria are required.")
     @Valid
-    List<RoundCriterionCreateRequest> roundCriteria = new ArrayList<>();
+    List<RoundCriterionCreateRequest> roundCriteria;
 }
