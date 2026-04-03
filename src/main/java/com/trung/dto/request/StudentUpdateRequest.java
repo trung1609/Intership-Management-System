@@ -1,8 +1,5 @@
 package com.trung.dto.request;
 
-import com.trung.validation.Name;
-import com.trung.validation.PhoneNumber;
-import com.trung.validation.StudentCode;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
@@ -14,26 +11,26 @@ import lombok.*;
 @Builder
 public class StudentUpdateRequest {
 
-    @StudentCode
+    @Pattern(regexp = "^(|S[a-zA-Z0-9]{7})$", message = "Student code must start with 'S' followed by 7 digits.")
     private String studentCode;
 
-    @Name
+    @Pattern(regexp = "^(|[\\p{L}0-9]+( [\\p{L}0-9]+)*)$", message = "Invalid full name. Full name must contain only letters, numbers, and spaces, and cannot start or end with a space.")
     private String fullName;
 
     @Email(message = "Email is not valid")
     private String email;
 
-    @PhoneNumber
+    @Pattern(regexp = "^(|0[356789]\\d{8})$", message = "Invalid phone number. Phone number must be 10 digits and start with '0'.")
     private String phoneNumber;
 
 
-    @Name(message = "Major must contain only letters and numbers separated by single spaces")
+    @Pattern(regexp = "^(|[\\p{L}0-9]+( [\\p{L}0-9]+)*)$", message = "Major must contain only letters and numbers separated by single spaces")
     public String major;
 
-    @Name(message = "Class room must contain only letters and numbers separated by single spaces")
+    @Pattern(regexp = "^(|[\\p{L}0-9]+( [\\p{L}0-9]+)*)$", message = "Class room must contain only letters and numbers separated by single spaces")
     private String classRoom;
 
-    @Name(message = "Address must contain only letters and numbers separated by single spaces")
+    @Pattern(regexp = "^(|[\\p{L}0-9]+( [\\p{L}0-9]+)*)$", message = "Address must contain only letters and numbers separated by single spaces")
     private String address;
 
     private String dateOfBirth;

@@ -1,7 +1,5 @@
 package com.trung.dto.request;
 
-import com.trung.validation.Name;
-import com.trung.validation.UniqueCriteria;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -17,8 +15,7 @@ import java.math.BigDecimal;
 @Builder
 public class EvaluationCriteriaCreateRequest {
     @NotBlank(message = "Criterion name is required")
-    @UniqueCriteria
-    @Name(message = "Criterion name must contain only letters and numbers, and cannot have leading or trailing spaces")
+    @Pattern(regexp = "^(|[\\p{L}0-9]+( [\\p{L}0-9]+)*)$", message = "Criterion name must contain only letters and numbers separated by single spaces")
     private String criterionName;
 
     private String description;

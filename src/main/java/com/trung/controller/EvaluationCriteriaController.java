@@ -24,7 +24,7 @@ public class EvaluationCriteriaController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse<EvaluationCriteriaResponse>> createCriteria(@Valid @RequestBody EvaluationCriteriaCreateRequest request) {
+    public ResponseEntity<ApiResponse<EvaluationCriteriaResponse>> createCriteria(@Valid @RequestBody EvaluationCriteriaCreateRequest request) throws ResourceConflictException {
         return new ResponseEntity<>(evaluationCriteriaService.createCriteria(request), HttpStatus.CREATED);
     }
 

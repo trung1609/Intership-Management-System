@@ -10,7 +10,7 @@ import com.trung.exception.ResourceConflictException;
 import com.trung.exception.ResourceNotFoundException;
 
 public interface IEvaluationCriteriaService {
-    ApiResponse<EvaluationCriteriaResponse> createCriteria(EvaluationCriteriaCreateRequest request);
+    ApiResponse<EvaluationCriteriaResponse> createCriteria(EvaluationCriteriaCreateRequest request) throws ResourceConflictException;
     PageResponseDTO<EvaluationCriteriaResponse> getAllCriteria(String search, PageRequestDTO pageRequestDTO);
     ApiResponse<EvaluationCriteriaResponse> getCriteriaById(Long id) throws ResourceNotFoundException;
     ApiResponse<EvaluationCriteriaResponse> updateCriteria(Long id, EvaluationCriteriaUpdateRequest request) throws ResourceNotFoundException, ResourceConflictException;

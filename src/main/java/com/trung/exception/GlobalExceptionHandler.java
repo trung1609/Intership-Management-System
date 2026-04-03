@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
                 .stream()
                 .collect(Collectors.toMap(
                         FieldError::getField,
-                        DefaultMessageSourceResolvable::getDefaultMessage
+                        FieldError::getDefaultMessage
                 ));
 
         ApiResponse<Object> response = ApiResponse.builder()

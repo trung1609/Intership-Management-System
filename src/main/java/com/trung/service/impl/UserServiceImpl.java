@@ -67,9 +67,21 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public ApiResponse<UserResponse> createProfile(UserCreateRequest userCreateRequest) throws ResourceBadRequestException {
+    public ApiResponse<UserResponse> createProfile(UserCreateRequest userCreateRequest) throws ResourceBadRequestException, ResourceConflictException {
         Role roleEnum = null;
         Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
+
+        if (userRepository.existsByUsername(userCreateRequest.getUsername())) {
+            ValidationErrorUtil.addError(errorList, "username", "Username already exists");
+        }
+
+        if (userRepository.existsByEmailAndIsDeletedFalseAndIsActiveTrue(userCreateRequest.getEmail())) {
+            ValidationErrorUtil.addError(errorList, "email", "Email already exists");
+        }
+
+        if (ValidationErrorUtil.hasErrors(errorList)) {
+            throw new ResourceConflictException("CONFLICT", errorList);
+        }
 
         try {
             roleEnum = Role.valueOf(userCreateRequest.getRole().toUpperCase());

@@ -23,7 +23,9 @@ public interface IAssessmentRoundsRepository extends JpaRepository<AssessmentRou
     Page<AssessmentRound> findAllByKeyword(@Param("keyword") String keyword,
                                            Pageable pageable);
 
-    Page<AssessmentRound> findAllByPhase_PhaseId(Long phaseId, Pageable pageable);
+    @Query("select a from AssessmentRound a where a.phase.phaseId = :phaseId")
+    Page<AssessmentRound> findAllByPhase_PhaseId(@Param("phaseId") Long phaseId,
+                                                 Pageable pageable);
 
     @Query("select a from AssessmentRound a join RoundCriteria r on a.roundId = r.round.roundId " +
             "join EvaluationCriteria e on e.criterionId = r.criterion.criterionId " +

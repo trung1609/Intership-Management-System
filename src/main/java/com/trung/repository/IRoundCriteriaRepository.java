@@ -26,8 +26,8 @@ public interface IRoundCriteriaRepository extends JpaRepository<RoundCriteria, L
 
     Optional<RoundCriteria> findByRoundCriteriaId(Long roundCriteriaId);
 
-
-    Page<RoundCriteria> findAllByRound_RoundId(Long roundId, Pageable pageable);
+    @Query("select rc from RoundCriteria rc where rc.round.roundId = :roundId")
+    Page<RoundCriteria> findAllByRound_RoundId(@Param("roundId") Long roundId, Pageable pageable);
 
 
     @Query("select rc.criterion from RoundCriteria rc where " +

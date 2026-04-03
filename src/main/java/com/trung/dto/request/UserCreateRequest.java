@@ -1,8 +1,8 @@
 package com.trung.dto.request;
 
-import com.trung.validation.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 @Getter
@@ -11,26 +11,24 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class UserCreateRequest {
-
+    @Pattern(regexp = "^(|[a-zA-Z0-9_]+)$", message = "Username can only contain letters, numbers, and underscores")
     @NotBlank(message = "Username is required")
-    @Username
-    @UniqueUsername
     private String username;
 
+    @Pattern(regexp = "^(|(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-]).{8,})$", message = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one special character")
     @NotBlank(message = "Password is required")
-    @StrongPassword
     private String password;
 
+
+    @Pattern(regexp = "^(|[\\p{L}0-9]+( [\\p{L}0-9]+)*)$", message = "Full name can only contain letters, numbers and separated by single spaces")
     @NotBlank(message = "Full name is required")
-    @Name
     private String fullName;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email is invalid")
-    @UniqueEmail
     private String email;
 
-    @PhoneNumber
+    @Pattern(regexp = "^(|0[356789]\\d{8})$", message = "Invalid phone number. Phone number must be 10 digits and start with '0'.")
     private String phoneNumber;
 
     @NotBlank(message = "Role is required")

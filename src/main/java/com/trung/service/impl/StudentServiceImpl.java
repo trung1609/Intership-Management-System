@@ -44,6 +44,11 @@ public class StudentServiceImpl implements IStudentService {
         User user = iUserRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(request.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + request.getUserId()));
 
+        if (studentRepository.existsByStudentCode(request.getStudentCode())) {
+            errorList.put("studentCode", "Student code already exists");
+            throw new ResourceConflictException("Validation failed", errorList);
+        }
+
         if (user.getRole() != Role.ROLE_STUDENT) {
             throw new ResourceForbiddenException("User with id: " + request.getUserId() + " does not have STUDENT role");
         }
@@ -71,7 +76,6 @@ public class StudentServiceImpl implements IStudentService {
     public PageResponseDTO<StudentResponse> getAllStudent(PageRequestDTO pageRequestDTO) throws ResourceNotFoundException, ResourceForbiddenException {
 
         User currentUser = currentUserUtil.getCurrentUser();
-
         Page<Student> studentPage;
 
         if (currentUser.getRole() == Role.ROLE_ADMIN) {

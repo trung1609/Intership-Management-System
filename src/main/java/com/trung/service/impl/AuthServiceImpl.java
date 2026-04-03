@@ -46,8 +46,20 @@ public class AuthServiceImpl implements IAuthService {
     private long expire;
 
     @Override
-    public ApiResponse<RegisterResponse> register(FormRegisterRequest request) throws ResourceBadRequestException {
+    public ApiResponse<RegisterResponse> register(FormRegisterRequest request) throws ResourceBadRequestException, ResourceConflictException {
         Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
+
+        if (userRepository.existsByUsername(request.getUsername())) {
+            errorList.put("username", "Username already exists");
+        }
+
+        if (userRepository.existsByEmailAndIsDeletedFalseAndIsActiveTrue(request.getEmail())) {
+            errorList.put("email", "Email already exists");
+        }
+        if (ValidationErrorUtil.hasErrors(errorList)) {
+            throw new ResourceConflictException("Validation failed", errorList);
+        }
+
         User users = new User();
 
         if (request.getRole() != null) {

@@ -33,6 +33,12 @@ public class InternshipPhaseServiceImpl implements InternshipPhaseService {
 
     @Override
     public ApiResponse<InternshipPhaseResponse> createInternshipPhase(InternshipPhaseCreateRequest request) throws ResourceConflictException, InvalidDateFormatException {
+        Map<String, String> errors = ValidationErrorUtil.createErrorMap();
+        if (internshipPhaseRepository.existsByPhaseNameIgnoreCaseAndIsDeletedFalse(request.getPhaseName())) {
+            ValidationErrorUtil.addError(errors, "phaseName", "Internship phase name already exists");
+            throw new ResourceConflictException("CONFLICT", errors);
+        }
+
         InternshipPhase internshipPhase = InternshipPhaseMapper.toEntity(request);
         internshipPhaseRepository.save(internshipPhase);
 

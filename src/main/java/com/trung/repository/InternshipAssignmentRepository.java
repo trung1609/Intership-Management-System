@@ -20,9 +20,15 @@ public interface InternshipAssignmentRepository extends JpaRepository<Internship
             "where ia.mentor.mentorId = :mentorId")
     Page<Student> findStudentsByMentorId(@Param("mentorId") Long mentorId, Pageable pageable);
 
-    boolean existsByStudent_StudentIdAndPhase_PhaseId(Long studentId, Long phaseId);
+    @Query("select case when count(ia) > 0 then true else false end from InternshipAssignment ia " +
+            "where ia.student.studentId = :studentId and ia.phase.phaseId = :phaseId")
+    boolean existsByStudent_StudentIdAndPhase_PhaseId(@Param("studentId") Long studentId,
+                                                      @Param("phaseId") Long phaseId);
 
-    boolean existsByMentor_MentorIdAndAssignmentId(Long mentorId, Long assignmentId);
+    @Query("select case when count(ia) > 0 then true else false end from InternshipAssignment ia " +
+            "where ia.mentor.mentorId = :mentorId and ia.assignmentId = :assignmentId")
+    boolean existsByMentor_MentorIdAndAssignmentId(@Param("mentorId") Long mentorId,
+                                                   @Param("assignmentId") Long assignmentId);
 
     @Query("select ia from InternshipAssignment ia where ia.mentor.mentorId = :mentorId and ( " +
             ":search is null or :search = '' or " +

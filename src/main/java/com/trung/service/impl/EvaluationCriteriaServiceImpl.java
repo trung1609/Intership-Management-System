@@ -29,7 +29,13 @@ public class EvaluationCriteriaServiceImpl implements IEvaluationCriteriaService
     private final IEvaluationCriteriaRepository evaluationCriteriaRepository;
 
     @Override
-    public ApiResponse<EvaluationCriteriaResponse> createCriteria(EvaluationCriteriaCreateRequest request) {
+    public ApiResponse<EvaluationCriteriaResponse> createCriteria(EvaluationCriteriaCreateRequest request) throws ResourceConflictException {
+        Map<String, String> errors = ValidationErrorUtil.createErrorMap();
+        if (evaluationCriteriaRepository.existsByCriterionNameIgnoreCaseAndIsDeletedFalse(request.getCriterionName())) {
+            errors.put("criterionName", "Evaluation criteria name already exists");
+            throw new ResourceConflictException("CONFLICT", errors);
+        }
+
         EvaluationCriteria evaluationCriteria = EvaluationCriteriaMapper.toEntity(request);
 
         evaluationCriteriaRepository.save(evaluationCriteria);
