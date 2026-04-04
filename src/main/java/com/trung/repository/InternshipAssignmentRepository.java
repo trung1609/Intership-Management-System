@@ -1,9 +1,7 @@
 package com.trung.repository;
 
-import com.trung.domain.entity.AssessmentResult;
-import com.trung.domain.entity.InternshipAssignment;
-import com.trung.domain.entity.Student;
-import com.trung.domain.enums.AssignmentStatus;
+import com.trung.entity.InternshipAssignment;
+import com.trung.entity.Student;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

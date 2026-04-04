@@ -1,8 +1,13 @@
 package com.trung.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -33,5 +38,7 @@ public class StudentUpdateRequest {
     @Pattern(regexp = "^(|[\\p{L}0-9]+( [\\p{L}0-9]+)*)$", message = "Address must contain only letters and numbers separated by single spaces")
     private String address;
 
-    private String dateOfBirth;
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    @Past(message = "Date of birth must be in the past")
+    public LocalDate dateOfBirth;
 }

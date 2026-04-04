@@ -1,20 +1,17 @@
 package com.trung.mapper;
 
-import com.trung.domain.entity.AssessmentRound;
-import com.trung.domain.entity.InternshipPhase;
-import com.trung.domain.entity.RoundCriteria;
+import com.trung.entity.AssessmentRound;
+import com.trung.entity.InternshipPhase;
+import com.trung.entity.RoundCriteria;
 import com.trung.dto.request.AssessmentRoundCreateRequest;
 import com.trung.dto.request.AssessmentRoundUpdateRequest;
 import com.trung.dto.request.RoundCriterionUpdateRequest;
 import com.trung.dto.response.AssessmentRoundsResponse;
-import com.trung.dto.response.RoundCriterionResponse;
-import com.trung.exception.InvalidDateFormatException;
 import com.trung.exception.ResourceBadRequestException;
 import com.trung.exception.ResourceConflictException;
 import com.trung.exception.ResourceNotFoundException;
 import com.trung.util.ValidationErrorUtil;
 
-import java.time.LocalDate;
 import java.util.*;
 
 public class AssessmentRoundsMapper {
@@ -31,40 +28,34 @@ public class AssessmentRoundsMapper {
                 .build();
     }
 
-    public static AssessmentRound toEntity(AssessmentRoundCreateRequest request, InternshipPhase phase) throws InvalidDateFormatException {
-        String dateFormat = "dd/MM/yyyy";
-        LocalDate startDateFormat = ValidationErrorUtil.isValidDate(request.getStartDate(), dateFormat);
-        LocalDate endDateFormat = ValidationErrorUtil.isValidDate(request.getEndDate(), dateFormat);
+    public static AssessmentRound toEntity(AssessmentRoundCreateRequest request, InternshipPhase phase) {
         return AssessmentRound.builder()
                 .phase(phase)
                 .roundName(request.getRoundName())
-                .startDate(startDateFormat)
-                .endDate(endDateFormat)
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
                 .description(request.getDescription())
                 .build();
     }
 
-    public static void updateFromDto(AssessmentRound assessmentRound, AssessmentRoundUpdateRequest request) throws InvalidDateFormatException, ResourceConflictException, ResourceBadRequestException, ResourceNotFoundException {
-        String dateFormat = "dd/MM/yyyy";
+    public static void updateFromDto(AssessmentRound assessmentRound, AssessmentRoundUpdateRequest request) throws ResourceConflictException, ResourceBadRequestException, ResourceNotFoundException {
         Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         if (request.getRoundName() != null) {
             assessmentRound.setRoundName(request.getRoundName());
         }
         if (request.getStartDate() != null) {
-            LocalDate startDateFormat = ValidationErrorUtil.isValidDate(request.getStartDate(), dateFormat);
-            if (startDateFormat.isAfter(assessmentRound.getEndDate())) {
+            if (request.getStartDate().isAfter(assessmentRound.getEndDate())) {
                 errorList.put("startDate", "Start date cannot be after end date");
                 throw new ResourceBadRequestException("Validation failed", errorList);
             }
-            assessmentRound.setStartDate(startDateFormat);
+            assessmentRound.setStartDate(request.getStartDate());
         }
         if (request.getEndDate() != null) {
-            LocalDate endDateFormat = ValidationErrorUtil.isValidDate(request.getEndDate(), dateFormat);
-            if (endDateFormat.isBefore(assessmentRound.getStartDate())) {
+            if (request.getEndDate().isBefore(assessmentRound.getStartDate())) {
                 errorList.put("endDate", "End date cannot be before start date");
                 throw new ResourceBadRequestException("Validation failed", errorList);
             }
-            assessmentRound.setEndDate(endDateFormat);
+            assessmentRound.setEndDate(request.getEndDate());
         }
         if (request.getDescription() != null) {
             assessmentRound.setDescription(request.getDescription());

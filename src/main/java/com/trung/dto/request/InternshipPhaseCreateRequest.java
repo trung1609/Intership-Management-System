@@ -1,9 +1,13 @@
 package com.trung.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.trung.validation.ValidDateRange;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -16,11 +20,13 @@ public class InternshipPhaseCreateRequest {
     @Pattern(regexp = "^(|[\\p{L}0-9]+( [\\p{L}0-9]+)*)$", message = "Phase name must contain only letters and numbers, and cannot have leading or trailing spaces")
     private String phaseName;
 
-    @NotBlank(message = "Start date is required")
-    private String startDate;
+    @NotNull(message = "Start date is required")
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate startDate;
 
-    @NotBlank(message = "End date is required")
-    private String endDate;
+    @NotNull(message = "End date is required")
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate endDate;
 
 
     private String description;

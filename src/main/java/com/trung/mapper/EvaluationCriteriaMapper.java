@@ -1,6 +1,6 @@
 package com.trung.mapper;
 
-import com.trung.domain.entity.EvaluationCriteria;
+import com.trung.entity.EvaluationCriteria;
 import com.trung.dto.request.EvaluationCriteriaCreateRequest;
 import com.trung.dto.request.EvaluationCriteriaUpdateRequest;
 import com.trung.dto.response.EvaluationCriteriaResponse;

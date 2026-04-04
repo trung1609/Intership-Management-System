@@ -1,11 +1,10 @@
-package com.trung.domain.entity;
+package com.trung.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,24 +13,21 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class EvaluationCriteria {
+public class Mentor {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long criterionId;
+    private Long mentorId;
 
-    @Column(nullable = false)
-    private String criterionName;
+    @OneToOne
+    @MapsId // Đảm bảo mentorId và userId là cùng một giá trị
+    @JoinColumn(name = "mentor_id")
+    private User user;
 
-    private String description;
-
-    @Column(nullable = false)
-    private BigDecimal maxScore;
+    private String department;
+    private String academicRank;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    private boolean isDeleted = false;
 }

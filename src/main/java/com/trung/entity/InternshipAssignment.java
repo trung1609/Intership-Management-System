@@ -1,6 +1,6 @@
-package com.trung.domain.entity;
+package com.trung.entity;
 
-import com.trung.domain.enums.AssignmentStatus;
+import com.trung.util.enums.AssignmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

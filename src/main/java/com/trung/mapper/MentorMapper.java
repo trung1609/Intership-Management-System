@@ -1,6 +1,6 @@
 package com.trung.mapper;
 
-import com.trung.domain.entity.Mentor;
+import com.trung.entity.Mentor;
 import com.trung.dto.request.MentorCreateRequest;
 import com.trung.dto.request.MentorUpdateRequest;
 import com.trung.dto.response.MentorPublicResponse;

@@ -1,7 +1,6 @@
 package com.trung.mapper;
 
-import com.trung.domain.entity.User;
-import com.trung.domain.enums.Role;
+import com.trung.entity.User;
 import com.trung.dto.request.UserUpdateRequest;
 import com.trung.dto.response.UserResponse;
 

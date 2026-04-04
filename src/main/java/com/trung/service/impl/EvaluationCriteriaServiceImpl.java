@@ -1,6 +1,6 @@
 package com.trung.service.impl;
 
-import com.trung.domain.entity.EvaluationCriteria;
+import com.trung.entity.EvaluationCriteria;
 import com.trung.dto.request.EvaluationCriteriaCreateRequest;
 import com.trung.dto.request.EvaluationCriteriaUpdateRequest;
 import com.trung.dto.request.PageRequestDTO;
@@ -20,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 @Service

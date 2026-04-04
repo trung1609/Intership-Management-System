@@ -1,13 +1,12 @@
 package com.trung.service.impl;
 
-import com.trung.domain.entity.InternshipPhase;
+import com.trung.entity.InternshipPhase;
 import com.trung.dto.request.InternshipPhaseCreateRequest;
 import com.trung.dto.request.InternshipPhaseUpdateRequest;
 import com.trung.dto.request.PageRequestDTO;
 import com.trung.dto.response.ApiResponse;
 import com.trung.dto.response.InternshipPhaseResponse;
 import com.trung.dto.response.PageResponseDTO;
-import com.trung.exception.InvalidDateFormatException;
 import com.trung.exception.ResourceBadRequestException;
 import com.trung.exception.ResourceConflictException;
 import com.trung.exception.ResourceNotFoundException;
@@ -22,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -32,7 +30,7 @@ public class InternshipPhaseServiceImpl implements InternshipPhaseService {
 
 
     @Override
-    public ApiResponse<InternshipPhaseResponse> createInternshipPhase(InternshipPhaseCreateRequest request) throws ResourceConflictException, InvalidDateFormatException {
+    public ApiResponse<InternshipPhaseResponse> createInternshipPhase(InternshipPhaseCreateRequest request) throws ResourceConflictException {
         Map<String, String> errors = ValidationErrorUtil.createErrorMap();
         if (internshipPhaseRepository.existsByPhaseNameIgnoreCaseAndIsDeletedFalse(request.getPhaseName())) {
             ValidationErrorUtil.addError(errors, "phaseName", "Internship phase name already exists");
@@ -73,7 +71,7 @@ public class InternshipPhaseServiceImpl implements InternshipPhaseService {
     }
 
     @Override
-    public ApiResponse<InternshipPhaseResponse> updateInternshipPhase(Long id, InternshipPhaseUpdateRequest request) throws ResourceNotFoundException, ResourceConflictException, InvalidDateFormatException, ResourceBadRequestException {
+    public ApiResponse<InternshipPhaseResponse> updateInternshipPhase(Long id, InternshipPhaseUpdateRequest request) throws ResourceNotFoundException, ResourceConflictException, ResourceBadRequestException {
         Map<String, String> errors = ValidationErrorUtil.createErrorMap();
         InternshipPhase existingPhase = internshipPhaseRepository.findByPhaseIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Internship phase not found with id: " + id));

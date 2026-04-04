@@ -1,4 +1,4 @@
-package com.trung.domain.entity;
+package com.trung.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,21 +8,19 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "assessment_results", uniqueConstraints = @UniqueConstraint(columnNames = {"assignment_id", "round_id", "criterion_id"}))
-public class AssessmentResult {
+@Table(name = "round_criteria",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"round_id", "criterion_id"}))
+public class RoundCriteria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long resultId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assignment_id", nullable = false)
-    private InternshipAssignment assignment;
+    private Long roundCriteriaId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "round_id", nullable = false)
@@ -33,19 +31,13 @@ public class AssessmentResult {
     private EvaluationCriteria criterion;
 
     @Column(nullable = false)
-    private BigDecimal score;
-
-    private String comment;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "evaluation_id", nullable = false)
-    private User evaluationId;
-
-    private LocalDateTime evaluationDate;
+    private BigDecimal weight;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    private boolean isDeleted = false;
 }

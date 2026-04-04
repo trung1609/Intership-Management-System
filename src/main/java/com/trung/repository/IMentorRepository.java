@@ -1,6 +1,6 @@
 package com.trung.repository;
 
-import com.trung.domain.entity.Mentor;
+import com.trung.entity.Mentor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

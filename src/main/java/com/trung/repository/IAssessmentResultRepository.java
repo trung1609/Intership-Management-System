@@ -1,9 +1,9 @@
 package com.trung.repository;
 
-import com.trung.domain.entity.AssessmentResult;
-import com.trung.domain.entity.AssessmentRound;
-import com.trung.domain.entity.EvaluationCriteria;
-import com.trung.domain.entity.InternshipAssignment;
+import com.trung.entity.AssessmentResult;
+import com.trung.entity.AssessmentRound;
+import com.trung.entity.EvaluationCriteria;
+import com.trung.entity.InternshipAssignment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

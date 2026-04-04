@@ -1,7 +1,7 @@
 package com.trung.exception;
 
 import com.trung.dto.response.ApiResponse;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
+import com.trung.util.ValidationErrorUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -85,14 +86,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(InvalidDateFormatException.class)
-    public ResponseEntity<ApiResponse<Object>> handleInvalidFormat(InvalidDateFormatException ex) {
-        return ResponseEntity.badRequest().body(
-                new ApiResponse<>(null, false, "Invalid date format, please use dd/MM/yyyy", null, LocalDateTime.now())
-        );
-    }
-
-
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ApiResponse<Object>> handleInvalidCredentialsException(InvalidCredentialsException ex) {
         ApiResponse<Object> response = ApiResponse.builder()
@@ -107,13 +100,34 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneralException(HttpMessageNotReadableException ex) {
+        String message = "Invalid request format";
+
+        Map<String, String> errors = ValidationErrorUtil.createErrorMap();
+
+        Throwable rootCause = getRootCause(ex);
+        if (rootCause instanceof DateTimeParseException){
+            message = "Validation failed";
+            errors.put("dateOfBirth", "Invalid date format, please use dd/MM/yyyy");
+        }else {
+            errors.put("error", message);
+        }
+
         ApiResponse<Object> response = ApiResponse.builder()
                 .success(false)
-                .message("INTERNAL_SERVER_ERROR")
+                .message(message)
                 .data(null)
-                .error(Map.of("error", ex.getMessage()))
+                .error(errors)
                 .timestamp(LocalDateTime.now())
                 .build();
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+
+    // Đào sâu cause chain vi no duoc boc nhieu lop
+    private Throwable getRootCause(Throwable throwable) {
+        while (throwable.getCause() != null) {
+            throwable = throwable.getCause();
+        }
+        return throwable;
     }
 }

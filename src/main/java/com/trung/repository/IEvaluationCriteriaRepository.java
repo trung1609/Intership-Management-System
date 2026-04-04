@@ -1,6 +1,6 @@
 package com.trung.repository;
 
-import com.trung.domain.entity.EvaluationCriteria;
+import com.trung.entity.EvaluationCriteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

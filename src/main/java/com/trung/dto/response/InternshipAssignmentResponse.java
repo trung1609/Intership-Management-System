@@ -1,6 +1,6 @@
 package com.trung.dto.response;
 
-import com.trung.domain.enums.AssignmentStatus;
+import com.trung.util.enums.AssignmentStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;

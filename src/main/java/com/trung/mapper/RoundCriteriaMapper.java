@@ -1,8 +1,8 @@
 package com.trung.mapper;
 
-import com.trung.domain.entity.AssessmentRound;
-import com.trung.domain.entity.EvaluationCriteria;
-import com.trung.domain.entity.RoundCriteria;
+import com.trung.entity.AssessmentRound;
+import com.trung.entity.EvaluationCriteria;
+import com.trung.entity.RoundCriteria;
 import com.trung.dto.request.RoundCriterionCreateRequest;
 import com.trung.dto.request.RoundCriterionUpdateRequest;
 import com.trung.dto.response.RoundCriterionResponse;

@@ -1,5 +1,6 @@
 package com.trung.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.trung.validation.ValidDateRange;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -7,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -24,11 +26,14 @@ public class AssessmentRoundCreateRequest {
     @Pattern(regexp = "^(|[\\p{L}0-9]+( [\\p{L}0-9]+)*)$", message = "Round name must contain only letters and numbers, and cannot have leading or trailing spaces")
     private String roundName;
 
-    @NotBlank(message = "Start date is required.")
-    private String startDate;
+    @NotNull(message = "Start date is required.")
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate startDate;
 
-    @NotBlank(message = "End date is required.")
-    private String endDate;
+    @NotNull(message = "End date is required.")
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate endDate;
+
     private String description;
 
     @NotNull(message = "Evaluation criteria are required.")

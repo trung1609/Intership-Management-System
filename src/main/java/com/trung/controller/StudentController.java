@@ -23,7 +23,7 @@ public class StudentController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse<StudentResponse>> createStudent(@Valid @RequestBody StudentCreateRequest request) throws ResourceConflictException, ResourceNotFoundException, ResourceBadRequestException, InvalidDateFormatException, ResourceForbiddenException {
+    public ResponseEntity<ApiResponse<StudentResponse>> createStudent(@Valid @RequestBody StudentCreateRequest request) throws ResourceConflictException, ResourceNotFoundException, ResourceBadRequestException, ResourceForbiddenException {
         return new ResponseEntity<>(studentService.createStudent(request), org.springframework.http.HttpStatus.CREATED);
     }
 
@@ -40,7 +40,7 @@ public class StudentController {
 
     @PutMapping("/{studentId}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_STUDENT')")
-    public ResponseEntity<ApiResponse<StudentResponse>> updateStudent(@PathVariable Long studentId, @Valid @RequestBody StudentUpdateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, ResourceForbiddenException, ResourceConflictException, InvalidDateFormatException {
+    public ResponseEntity<ApiResponse<StudentResponse>> updateStudent(@PathVariable Long studentId, @Valid @RequestBody StudentUpdateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, ResourceForbiddenException, ResourceConflictException {
         return new ResponseEntity<>(studentService.updateStudent(studentId, request), HttpStatus.OK);
     }
 }

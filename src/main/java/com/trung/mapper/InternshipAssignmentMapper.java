@@ -1,10 +1,10 @@
 package com.trung.mapper;
 
-import com.trung.domain.entity.InternshipAssignment;
-import com.trung.domain.entity.InternshipPhase;
-import com.trung.domain.entity.Mentor;
-import com.trung.domain.entity.Student;
-import com.trung.domain.enums.AssignmentStatus;
+import com.trung.entity.InternshipAssignment;
+import com.trung.entity.InternshipPhase;
+import com.trung.entity.Mentor;
+import com.trung.entity.Student;
+import com.trung.util.enums.AssignmentStatus;
 import com.trung.dto.response.InternshipAssignmentResponse;
 
 import java.time.LocalDateTime;

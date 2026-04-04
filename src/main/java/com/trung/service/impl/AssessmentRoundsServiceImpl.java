@@ -1,24 +1,21 @@
 package com.trung.service.impl;
 
-import com.trung.domain.entity.AssessmentRound;
-import com.trung.domain.entity.EvaluationCriteria;
-import com.trung.domain.entity.InternshipPhase;
-import com.trung.domain.entity.RoundCriteria;
+import com.trung.entity.AssessmentRound;
+import com.trung.entity.EvaluationCriteria;
+import com.trung.entity.InternshipPhase;
+import com.trung.entity.RoundCriteria;
 import com.trung.dto.request.*;
 import com.trung.dto.response.ApiResponse;
 import com.trung.dto.response.AssessmentRoundsResponse;
 import com.trung.dto.response.PageResponseDTO;
-import com.trung.exception.InvalidDateFormatException;
 import com.trung.exception.ResourceBadRequestException;
 import com.trung.exception.ResourceConflictException;
 import com.trung.exception.ResourceNotFoundException;
 import com.trung.mapper.AssessmentRoundsMapper;
 import com.trung.repository.IAssessmentRoundsRepository;
 import com.trung.repository.IEvaluationCriteriaRepository;
-import com.trung.repository.IRoundCriteriaRepository;
 import com.trung.repository.InternshipPhaseRepository;
 import com.trung.service.IAssessmentRoundsService;
-import com.trung.service.IEvaluationCriteriaService;
 import com.trung.util.PaginationUtil;
 import com.trung.util.ValidationErrorUtil;
 import jakarta.transaction.Transactional;
@@ -41,7 +38,7 @@ public class AssessmentRoundsServiceImpl implements IAssessmentRoundsService {
 
     @Override
     @Transactional
-    public ApiResponse<AssessmentRoundsResponse> createAssessmentRound(AssessmentRoundCreateRequest request) throws ResourceNotFoundException, InvalidDateFormatException, ResourceConflictException {
+    public ApiResponse<AssessmentRoundsResponse> createAssessmentRound(AssessmentRoundCreateRequest request) throws ResourceNotFoundException, ResourceConflictException {
         Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         InternshipPhase phase = internshipPhaseRepository.findByPhaseIdAndIsDeletedFalse(request.getPhaseId())
                 .orElseThrow(() -> new ResourceNotFoundException("Internship phase not found with id: " + request.getPhaseId()));
@@ -112,7 +109,7 @@ public class AssessmentRoundsServiceImpl implements IAssessmentRoundsService {
     }
 
     @Override
-    public ApiResponse<AssessmentRoundsResponse> updateAssessmentRound(Long id, AssessmentRoundUpdateRequest request) throws ResourceNotFoundException, InvalidDateFormatException, ResourceConflictException, ResourceBadRequestException {
+    public ApiResponse<AssessmentRoundsResponse> updateAssessmentRound(Long id, AssessmentRoundUpdateRequest request) throws ResourceNotFoundException, ResourceConflictException, ResourceBadRequestException {
         AssessmentRound assessmentRound = assessmentRoundsRepository.findByRoundIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Assessment round not found with id: " + id));
 

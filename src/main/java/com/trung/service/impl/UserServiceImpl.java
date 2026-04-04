@@ -1,7 +1,7 @@
 package com.trung.service.impl;
 
-import com.trung.domain.entity.User;
-import com.trung.domain.enums.Role;
+import com.trung.entity.User;
+import com.trung.util.enums.Role;
 import com.trung.dto.request.PageRequestDTO;
 import com.trung.dto.request.UpdateRoleRequest;
 import com.trung.dto.request.UserCreateRequest;

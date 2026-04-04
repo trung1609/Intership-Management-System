@@ -7,7 +7,6 @@ import com.trung.dto.request.PageRequestDTO;
 import com.trung.dto.response.ApiResponse;
 import com.trung.dto.response.InternshipPhaseResponse;
 import com.trung.dto.response.PageResponseDTO;
-import com.trung.exception.InvalidDateFormatException;
 import com.trung.exception.ResourceBadRequestException;
 import com.trung.exception.ResourceConflictException;
 import com.trung.exception.ResourceNotFoundException;
@@ -27,7 +26,7 @@ public class InternshipPhaseController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse<InternshipPhaseResponse>> createInternshipPhase(@Valid @RequestBody InternshipPhaseCreateRequest request) throws ResourceConflictException, InvalidDateFormatException {
+    public ResponseEntity<ApiResponse<InternshipPhaseResponse>> createInternshipPhase(@Valid @RequestBody InternshipPhaseCreateRequest request) throws ResourceConflictException {
         return new ResponseEntity<>(internshipPhaseService.createInternshipPhase(request), HttpStatus.CREATED);
     }
 
@@ -46,7 +45,7 @@ public class InternshipPhaseController {
 
     @PutMapping("/{phaseId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse<InternshipPhaseResponse>> updateInternshipPhase(@PathVariable Long phaseId, @Valid @RequestBody InternshipPhaseUpdateRequest request) throws ResourceNotFoundException, ResourceConflictException, InvalidDateFormatException, ResourceBadRequestException {
+    public ResponseEntity<ApiResponse<InternshipPhaseResponse>> updateInternshipPhase(@PathVariable Long phaseId, @Valid @RequestBody InternshipPhaseUpdateRequest request) throws ResourceNotFoundException, ResourceConflictException, ResourceBadRequestException {
         return new ResponseEntity<>(internshipPhaseService.updateInternshipPhase(phaseId, request), HttpStatus.OK);
     }
 

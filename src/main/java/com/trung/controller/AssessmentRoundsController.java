@@ -6,13 +6,11 @@ import com.trung.dto.request.PageRequestDTO;
 import com.trung.dto.response.ApiResponse;
 import com.trung.dto.response.AssessmentRoundsResponse;
 import com.trung.dto.response.PageResponseDTO;
-import com.trung.exception.InvalidDateFormatException;
 import com.trung.exception.ResourceBadRequestException;
 import com.trung.exception.ResourceConflictException;
 import com.trung.exception.ResourceNotFoundException;
 import com.trung.service.IAssessmentRoundsService;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,26 +26,26 @@ public class AssessmentRoundsController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse<AssessmentRoundsResponse>> createAssessmentRound(@Valid @RequestBody AssessmentRoundCreateRequest request) throws InvalidDateFormatException, ResourceNotFoundException, ResourceConflictException {
+    public ResponseEntity<ApiResponse<AssessmentRoundsResponse>> createAssessmentRound(@Valid @RequestBody AssessmentRoundCreateRequest request) throws ResourceNotFoundException, ResourceConflictException {
         return new ResponseEntity<>(assessmentRoundsService.createAssessmentRound(request), HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<PageResponseDTO<AssessmentRoundsResponse>> getAllAssessmentRound(@RequestParam(required = false) String search,
                                                                                            @RequestParam(required = false) Long phaseId,
-                                                                                           @ModelAttribute PageRequestDTO request) throws InvalidDateFormatException, ResourceNotFoundException, ResourceConflictException {
+                                                                                           @ModelAttribute PageRequestDTO request){
         return new ResponseEntity<>(assessmentRoundsService.getAllAssessmentRound(search, phaseId, request), HttpStatus.OK);
     }
 
     @GetMapping("/{roundId}")
-    public ResponseEntity<ApiResponse<AssessmentRoundsResponse>> getAssessmentRoundById(@PathVariable Long roundId) throws InvalidDateFormatException, ResourceNotFoundException, ResourceConflictException {
+    public ResponseEntity<ApiResponse<AssessmentRoundsResponse>> getAssessmentRoundById(@PathVariable Long roundId) throws ResourceNotFoundException {
         return new ResponseEntity<>(assessmentRoundsService.getAssessmentRoundById(roundId), HttpStatus.OK);
     }
 
      @PutMapping("/{roundId}")
      @PreAuthorize("hasAuthority('ROLE_ADMIN')")
      public ResponseEntity<ApiResponse<AssessmentRoundsResponse>> updateAssessmentRound(@PathVariable Long roundId,
-                                                                                        @Valid @RequestBody AssessmentRoundUpdateRequest request) throws InvalidDateFormatException, ResourceNotFoundException, ResourceConflictException, ResourceBadRequestException {
+                                                                                        @Valid @RequestBody AssessmentRoundUpdateRequest request) throws ResourceNotFoundException, ResourceConflictException, ResourceBadRequestException {
          return new ResponseEntity<>(assessmentRoundsService.updateAssessmentRound(roundId, request), HttpStatus.OK);
      }
 

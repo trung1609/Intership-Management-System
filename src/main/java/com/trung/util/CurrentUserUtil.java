@@ -1,8 +1,6 @@
 package com.trung.util;
 
-import com.trung.domain.entity.User;
-import com.trung.exception.ResourceNotFoundException;
-import com.trung.repository.IUserRepository;
+import com.trung.entity.User;
 import com.trung.security.principal.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

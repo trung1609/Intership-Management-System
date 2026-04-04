@@ -1,6 +1,6 @@
 package com.trung.security.principal;
 
-import com.trung.domain.entity.User;
+import com.trung.entity.User;
 import com.trung.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

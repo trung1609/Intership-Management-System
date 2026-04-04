@@ -1,6 +1,6 @@
 package com.trung.security.principal;
 
-import com.trung.domain.entity.User;
+import com.trung.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import org.jspecify.annotations.Nullable;

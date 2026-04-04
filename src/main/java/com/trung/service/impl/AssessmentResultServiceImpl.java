@@ -1,7 +1,6 @@
 package com.trung.service.impl;
 
-import com.trung.domain.entity.*;
-import com.trung.domain.enums.Role;
+import com.trung.util.enums.Role;
 import com.trung.dto.request.AssessmentResultCreateRequest;
 import com.trung.dto.request.AssessmentResultUpdateRequest;
 import com.trung.dto.request.CriterionScoreRequest;
@@ -9,6 +8,7 @@ import com.trung.dto.request.PageRequestDTO;
 import com.trung.dto.response.ApiResponse;
 import com.trung.dto.response.AssessmentResultResponse;
 import com.trung.dto.response.PageResponseDTO;
+import com.trung.entity.*;
 import com.trung.exception.ResourceConflictException;
 import com.trung.exception.ResourceForbiddenException;
 import com.trung.exception.ResourceNotFoundException;

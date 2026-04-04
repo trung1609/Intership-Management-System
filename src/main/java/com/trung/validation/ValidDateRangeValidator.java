@@ -1,13 +1,11 @@
 package com.trung.validation;
 
-import com.trung.exception.InvalidDateFormatException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.BeanWrapperImpl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class ValidDateRangeValidator implements ConstraintValidator<ValidDateRange, Object> {
     private String startDateField;
@@ -67,13 +65,6 @@ public class ValidDateRangeValidator implements ConstraintValidator<ValidDateRan
         if (startDateObj instanceof LocalDateTime && endDateObj instanceof LocalDateTime) {
             LocalDateTime startDate = (LocalDateTime) startDateObj;
             LocalDateTime endDate = (LocalDateTime) endDateObj;
-            return !startDate.isAfter(endDate);
-        }
-
-         if (startDateObj instanceof String && endDateObj instanceof String) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            LocalDate startDate = LocalDate.parse((String) startDateObj, formatter);
-            LocalDate endDate = LocalDate.parse((String) endDateObj, formatter);
             return !startDate.isAfter(endDate);
         }
 

@@ -1,7 +1,7 @@
 package com.trung.service.impl;
 
-import com.trung.domain.entity.User;
-import com.trung.domain.enums.Role;
+import com.trung.entity.User;
+import com.trung.util.enums.Role;
 import com.trung.dto.request.FormLoginRequest;
 import com.trung.dto.request.FormRegisterRequest;
 import com.trung.dto.response.*;
@@ -11,7 +11,6 @@ import com.trung.exception.ResourceConflictException;
 import com.trung.exception.ResourceNotFoundException;
 import com.trung.mapper.UserMapper;
 import com.trung.repository.IUserRepository;
-import com.trung.security.jwt.JwtAuthenticationFilter;
 import com.trung.security.jwt.JwtProvider;
 import com.trung.security.jwt.RefreshTokenService;
 import com.trung.security.jwt.TokenBlacklistService;
@@ -20,7 +19,6 @@ import com.trung.service.IAuthService;
 import com.trung.util.ValidationErrorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

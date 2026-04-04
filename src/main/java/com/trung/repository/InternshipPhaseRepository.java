@@ -1,6 +1,6 @@
 package com.trung.repository;
 
-import com.trung.domain.entity.InternshipPhase;
+import com.trung.entity.InternshipPhase;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

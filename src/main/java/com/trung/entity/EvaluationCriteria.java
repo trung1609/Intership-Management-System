@@ -1,11 +1,11 @@
-package com.trung.domain.entity;
+package com.trung.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,21 +14,18 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class InternshipPhase {
+public class EvaluationCriteria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long phaseId;
+    private Long criterionId;
 
     @Column(nullable = false)
-    private String phaseName;
-
-    @Column(nullable = false)
-    private LocalDate startDate;
-
-    @Column(nullable = false)
-    private LocalDate endDate;
+    private String criterionName;
 
     private String description;
+
+    @Column(nullable = false)
+    private BigDecimal maxScore;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

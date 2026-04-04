@@ -1,4 +1,4 @@
-package com.trung.domain.entity;
+package com.trung.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,8 +7,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -16,18 +14,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AssessmentRound {
+public class InternshipPhase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "round_id")
-    private Long roundId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "phase_id")
-    private InternshipPhase phase;
+    private Long phaseId;
 
     @Column(nullable = false)
-    private String roundName;
+    private String phaseName;
 
     @Column(nullable = false)
     private LocalDate startDate;
@@ -37,18 +30,11 @@ public class AssessmentRound {
 
     private String description;
 
-    @Builder.Default
-    @Column(nullable = false)
-    private Boolean isActive = true;
-
-    private boolean isDeleted = false;
-
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "round", cascade = CascadeType.ALL)
-    private List<RoundCriteria> roundCriteriaList;
+    private boolean isDeleted = false;
 }

@@ -1,4 +1,4 @@
-package com.trung.domain.enums;
+package com.trung.util.enums;
 
 public enum Role {
     ROLE_ADMIN,

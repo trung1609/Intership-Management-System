@@ -1,6 +1,6 @@
 package com.trung.mapper;
 
-import com.trung.domain.entity.AssessmentResult;
+import com.trung.entity.AssessmentResult;
 import com.trung.dto.request.AssessmentResultUpdateRequest;
 import com.trung.dto.response.AssessmentResultResponse;
 

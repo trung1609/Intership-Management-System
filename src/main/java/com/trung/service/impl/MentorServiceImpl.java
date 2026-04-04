@@ -1,8 +1,8 @@
 package com.trung.service.impl;
 
-import com.trung.domain.entity.Mentor;
-import com.trung.domain.entity.User;
-import com.trung.domain.enums.Role;
+import com.trung.entity.Mentor;
+import com.trung.entity.User;
+import com.trung.util.enums.Role;
 import com.trung.dto.request.MentorCreateRequest;
 import com.trung.dto.request.MentorUpdateRequest;
 import com.trung.dto.request.PageRequestDTO;
@@ -23,12 +23,9 @@ import com.trung.util.ValidationErrorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 @Service

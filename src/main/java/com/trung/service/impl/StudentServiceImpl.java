@@ -1,8 +1,8 @@
 package com.trung.service.impl;
 
-import com.trung.domain.entity.Student;
-import com.trung.domain.entity.User;
-import com.trung.domain.enums.Role;
+import com.trung.entity.Student;
+import com.trung.entity.User;
+import com.trung.util.enums.Role;
 import com.trung.dto.request.PageRequestDTO;
 import com.trung.dto.request.StudentCreateRequest;
 import com.trung.dto.request.StudentUpdateRequest;
@@ -21,13 +21,9 @@ import com.trung.util.ValidationErrorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -39,7 +35,7 @@ public class StudentServiceImpl implements IStudentService {
     private final CurrentUserUtil currentUserUtil;
 
     @Override
-    public ApiResponse<StudentResponse> createStudent(StudentCreateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, InvalidDateFormatException, ResourceForbiddenException, ResourceConflictException {
+    public ApiResponse<StudentResponse> createStudent(StudentCreateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, ResourceForbiddenException, ResourceConflictException {
         Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         User user = iUserRepository.findByUserIdAndIsDeletedFalseAndIsActiveTrue(request.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + request.getUserId()));
@@ -73,7 +69,7 @@ public class StudentServiceImpl implements IStudentService {
     }
 
     @Override
-    public PageResponseDTO<StudentResponse> getAllStudent(PageRequestDTO pageRequestDTO) throws ResourceNotFoundException, ResourceForbiddenException {
+    public PageResponseDTO<StudentResponse> getAllStudent(PageRequestDTO pageRequestDTO) throws ResourceForbiddenException {
 
         User currentUser = currentUserUtil.getCurrentUser();
         Page<Student> studentPage;
@@ -111,7 +107,7 @@ public class StudentServiceImpl implements IStudentService {
     }
 
     @Override
-    public ApiResponse<StudentResponse> updateStudent(Long id, StudentUpdateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, ResourceForbiddenException, ResourceConflictException, InvalidDateFormatException {
+    public ApiResponse<StudentResponse> updateStudent(Long id, StudentUpdateRequest request) throws ResourceNotFoundException, ResourceBadRequestException, ResourceForbiddenException, ResourceConflictException {
         Map<String, String> errorList = ValidationErrorUtil.createErrorMap();
         User currentUser = currentUserUtil.getCurrentUser();
 

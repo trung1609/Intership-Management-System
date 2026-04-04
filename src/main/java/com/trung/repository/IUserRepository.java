@@ -1,7 +1,7 @@
 package com.trung.repository;
 
-import com.trung.domain.entity.User;
-import com.trung.domain.enums.Role;
+import com.trung.entity.User;
+import com.trung.util.enums.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

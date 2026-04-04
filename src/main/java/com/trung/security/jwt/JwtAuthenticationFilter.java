@@ -1,6 +1,6 @@
 package com.trung.security.jwt;
 
-import com.trung.domain.entity.User;
+import com.trung.entity.User;
 import com.trung.repository.IUserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

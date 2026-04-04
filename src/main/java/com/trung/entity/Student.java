@@ -1,4 +1,4 @@
-package com.trung.domain.entity;
+package com.trung.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,7 +7,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Getter
